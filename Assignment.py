@@ -1,49 +1,46 @@
-package AutoGraderApp;
 
-import java.io.File;
-import java.util.ArrayList;
-
-/* ======================================================================
- * Assignment
- * ===================================================================== */
-public class Assignment implements java.io.Serializable {
-    //---------- general members ----------
-    public String studentName;
-    public String assignmentDirectory;
-    public ArrayList<File> assignmentFiles;
-    public File primaryAssignmentFile;
-    public String language;
-    //---------- code analysis members ----------
-    //public Integer linesOfCode;
-    //public Integer numComments;
-    //public Integer nunDocStrings;
-    //public Integer numFunctions;
-    //public Integer numClasses;
-    //---------- errors ----------
-    public String compilerErrors;
-    public String[] runtimeErrors;     //there are as many entries as we have test cases
-    //---------- processing/execution members ----------
-    public String[] progOutputs;     //there are as many entries as we have test cases
-    public Double[] executionTimes;      //the # of seconds required to complete execution
-    //---------- grading members ----------
-    public Boolean bAutoGraded;
-    public Integer grade;
-    public String instructorComment;
-    //---------- directives ----------
-    public String nameDirective;        //student name
-    public String titleDirective;       //assignment title
-    public String dateDirective;        //date
-    public String mainDirective;        //main module
-    public String dataDirective;        //misc. data
-
-}
+# =======================================================================
+# Assignment
+# =======================================================================
+class Assignment(object):
+    def __init__(self):
+        # ---------- general members ----------
+        self.studentName = ''
+        self.assignmentDirectory = ''
+        self.assignmentFiles = [] # array of file objects
+        self.primaryAssignmentFile = None # file object
+        self.language = ''
+        # ---------- code analysis members ----------
+        # self.linesOfCode = 0
+        # self.numComments = 0
+        # self.nunDocStrings = 0
+        # self.numFunctions = 0
+        # self.numClasses = 0
+        # ---------- errors ----------
+        self.compilerErrors = ''
+        self.runtimeErrors = []     # string array: there are as many entries as we have test cases
+        # ---------- processing/execution members ----------
+        self.progOutputs = []       # string array: there are as many entries as we have test cases
+        self.executionTimes = []    # string array: the # of seconds required to complete execution
+        # ---------- grading members ----------
+        self.bAutoGraded = False
+        self.grade = 0
+        self.instructorComment = ''
+        # ---------- directives ----------
+        self.nameDirective = ''        # student name
+        self.titleDirective = ''       # assignment title
+        self.dateDirective = ''        # date
+        self.mainDirective = ''        # main module
+        self.dataDirective = ''        # misc. data
 
 
-/* ======================================================================
- * xxx
- * ===================================================================== */
 
-//----------  ----------
-//----------  ----------
-//----------  ----------
-//----------  ----------
+
+# =======================================================================
+# xxx
+# =======================================================================
+
+# ----------  ----------
+# ----------  ----------
+# ----------  ----------
+# ----------  ----------

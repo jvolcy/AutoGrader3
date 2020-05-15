@@ -1,70 +1,65 @@
-package AutoGraderApp;
 
+# =======================================================================
+# Interface of AG2 constants.
+# ======================================================================
+class IAGConstant(object):
 
-/* ======================================================================
- * Interface of AG2 constants.
- * ===================================================================== */
-public interface IAGConstant {
+    # ---------- UI Constants ----------
+    MIN_STAGE_WIDTH = 600
+    MIN_STAGE_HEIGHT = 440
 
-    //---------- UI Constants ----------
-    public final int MIN_STAGE_WIDTH = 600;
-    public final int MIN_STAGE_HEIGHT = 440;
+    CONFIGURATION_TAB = 0
+    SETUP_INPUT_TAB = 1
+    OUTPUT_TAB = 2
+    CONSOLE_TAB = 3
+    HELP_TAB = 4
 
-    public final int CONFIGURATION_TAB = 0;
-    public final int SETUP_INPUT_TAB = 1;
-    public final int OUTPUT_TAB = 2;
-    public final int CONSOLE_TAB = 3;
-    public final int HELP_TAB = 4;
+    YES = "Yes"
+    NO = "No"
 
-    public final String YES = "Yes";
-    public final String NO = "No";
+    LANGUAGE_AUTO = "Auto"
+    LANGUAGE_PYTHON3 = "Python 3"
+    LANGUAGE_CPP = "C++"
+    LANGUAGE_UNKNOWN = "Unknown"
 
-    public final String LANGUAGE_AUTO = "Auto";
-    public final String LANGUAGE_PYTHON3 = "Python 3";
-    public final String LANGUAGE_CPP = "C++";
-    public final String LANGUAGE_UNKNOWN = "Unknown";
+    PYTHON_EXTENSIONS = ["py"]
+    CPP_COMPILER_EXTENSIONS = ["cpp", "c", "cc"]
+    CPP_EXTENSIONS = ["cpp", "c", "cc", "h", "hpp"]
+    PYTHON_AND_CPP_EXTENSIONS = ["py", "cpp", "c", "cc", "h", "hpp"]
+    COMPRESSION_EXTENSIONS = ["zip"]
 
-    public final String[] PYTHON_EXTENSIONS = {"py"};
-    public final String[] CPP_COMPILER_EXTENSIONS = {"cpp", "c", "cc"};
-    public final String[] CPP_EXTENSIONS = {"cpp", "c", "cc", "h", "hpp"};
-    public final String[] PYTHON_AND_CPP_EXTENSIONS = {"py", "cpp", "c", "cc", "h", "hpp"};
-    public final String[] COMPRESSION_EXTENSIONS = {"zip"};
+    # ---------- AG Options Dictionary Keys ----------
+    class AG_CONFIG(object):
+        LANGUAGE = "LANGUAGE"
+        MAX_RUNTIME = "MAX_RUNTIME"
+        MAX_OUTPUT_LINES = "MAX_OUTPUT_LINES"
+        INCLUDE_SOURCE = "INCLUDE_SOURCE"
+        AUTO_UNCOMPRESS = "AUTO_UNCOMPRESS"
+        PROCESS_RECURSIVELY = "PROCESS_RECURSIVELY"
+        PYTHON3_INTERPRETER = "PYTHON3_INTERPRETER"
+        CPP_COMPILER = "CPP_COMPILER"
+        SHELL = "SHELL"
 
-    //---------- AG Options Dictionary Keys ----------
-    public final class AG_CONFIG {
-        public static final String LANGUAGE = "LANGUAGE";
-        public static final String MAX_RUNTIME = "MAX_RUNTIME";
-        public static final String MAX_OUTPUT_LINES = "MAX_OUTPUT_LINES";
-        public static final String INCLUDE_SOURCE = "INCLUDE_SOURCE";
-        public static final String AUTO_UNCOMPRESS = "AUTO_UNCOMPRESS";
-        public static final String PROCESS_RECURSIVELY = "PROCESS_RECURSIVELY";
-        public static final String PYTHON3_INTERPRETER = "PYTHON3_INTERPRETER";
-        public static final String CPP_COMPILER = "CPP_COMPILER";
-        public static final String SHELL = "SHELL";
-    }
+    # ---------- AG Directives ----------
+    NAME_DIRECTIVE  =   "@@Name"
+    MAIN_DIRECTIVE =    "@@Main"
+    TITLE_DIRECTIVE =   "@@Title"
+    DATE_DIRECTIVE =    "@@Date"
+    DATA_DIRECTIVE =    "@@Data"
 
-    //---------- AG Directives ----------
-    public final String NAME_DIRECTIVE  =   "@@Name";
-    public final String MAIN_DIRECTIVE =    "@@Main";
-    public final String TITLE_DIRECTIVE =   "@@Title";
-    public final String DATE_DIRECTIVE =    "@@Date";
-    public final String DATA_DIRECTIVE =    "@@Data";
-
-    //---------- Misc Constants ----------
-    public final String TEST_CASE_SEPARATOR = "@@\n";
-    public final String CONFIG_FILENAME = "ag2Config.json";
-    public final String DEFAULT_MAIN_PYTHON_FILE = "main.py";
-}
+    # ---------- Misc Constants ----------
+    TEST_CASE_SEPARATOR = "@@\n"
+    CONFIG_FILENAME = "ag3Config.json"
+    DEFAULT_MAIN_PYTHON_FILE = "main.py"
 
 
 
 
+# =======================================================================
+# xxx
+# ======================================================================
 
-/* ======================================================================
- * xxx
- * ===================================================================== */
-
-//----------  ----------
-//----------  ----------
-//----------  ----------
-//----------  ----------
+# ----------  ----------
+# ----------  ----------
+# ----------  ----------
+# ----------  ----------
