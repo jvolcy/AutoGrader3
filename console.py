@@ -1,5 +1,5 @@
-def console(format, args=None):
-    Console.console(format, args)
+def console(format, *args):
+    Console.console(format, *args)
 
 class Console:
     # __consoleFunc is a private pointer to a user specified function.
@@ -9,11 +9,12 @@ class Console:
     __consoleFunc = None
 
     @classmethod
-    def console(cls, format, args=None):
+    def console(cls, fmt, *args):
         if cls.__consoleFunc == None:
-            print('[x]' + format % args)
+            #print('fmt=', fmt, 'args=', *args)
+            print('[x] ' + fmt % args)
         else:
-            cls.__consoleFunc('[c]' + format % args)
+            cls.__consoleFunc('[c] ' + fmt % args)
 
     @classmethod
     def setConsole(cls, targetFunc):

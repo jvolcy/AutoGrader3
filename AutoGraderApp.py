@@ -1,7 +1,7 @@
 from IAGConstant import IAGConstant
 from console import console
-from AutoGrader3 import AutoGrader3
-#import GradingEngine
+# from AutoGrader3 import AutoGrader3
+# import GradingEngine
 
 
 autoGrader =  None
@@ -16,6 +16,76 @@ copyrightText = "copyright 2016-2020"
 credits = "J Volcy"
 '''
 
+# from tkinter import *
+from tkinter import *
+#from tkinter.ttk import Button
+#from tkinter.ttk import Style
+
+class Controller(IAGConstant):
+
+    # static class members
+    __btnImgData = '''iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAEGWlDQ1BrQ0dDb2xvclNwYWNlR2VuZXJpY1JHQgAAOI2NVV1oHFUUPrtzZyMkzlNsNIV0qD8NJQ2TVjShtLp/3d02bpZJNtoi6GT27s6Yyc44M7v9oU9FUHwx6psUxL+3gCAo9Q/bPrQvlQol2tQgKD60+INQ6Ium65k7M5lpurHeZe58853vnnvuuWfvBei5qliWkRQBFpquLRcy4nOHj4g9K5CEh6AXBqFXUR0rXalMAjZPC3e1W99Dwntf2dXd/p+tt0YdFSBxH2Kz5qgLiI8B8KdVy3YBevqRHz/qWh72Yui3MUDEL3q44WPXw3M+fo1pZuQs4tOIBVVTaoiXEI/MxfhGDPsxsNZfoE1q66ro5aJim3XdoLFw72H+n23BaIXzbcOnz5mfPoTvYVz7KzUl5+FRxEuqkp9G/Ajia219thzg25abkRE/BpDc3pqvphHvRFys2weqvp+krbWKIX7nhDbzLOItiM8358pTwdirqpPFnMF2xLc1WvLyOwTAibpbmvHHcvttU57y5+XqNZrLe3lE/Pq8eUj2fXKfOe3pfOjzhJYtB/yll5SDFcSDiH+hRkH25+L+sdxKEAMZahrlSX8ukqMOWy/jXW2m6M9LDBc31B9LFuv6gVKg/0Szi3KAr1kGq1GMjU/aLbnq6/lRxc4XfJ98hTargX++DbMJBSiYMIe9Ck1YAxFkKEAG3xbYaKmDDgYyFK0UGYpfoWYXG+fAPPI6tJnNwb7ClP7IyF+D+bjOtCpkhz6CFrIa/I6sFtNl8auFXGMTP34sNwI/JhkgEtmDz14ySfaRcTIBInmKPE32kxyyE2Tv+thKbEVePDfW/byMM1Kmm0XdObS7oGD/MypMXFPXrCwOtoYjyyn7BV29/MZfsVzpLDdRtuIZnbpXzvlf+ev8MvYr/Gqk4H/kV/G3csdazLuyTMPsbFhzd1UabQbjFvDRmcWJxR3zcfHkVw9GfpbJmeev9F08WW8uDkaslwX6avlWGU6NRKz0g/SHtCy9J30o/ca9zX3Kfc19zn3BXQKRO8ud477hLnAfc1/G9mrzGlrfexZ5GLdn6ZZrrEohI2wVHhZywjbhUWEy8icMCGNCUdiBlq3r+xafL549HQ5jH+an+1y+LlYBifuxAvRN/lVVVOlwlCkdVm9NOL5BE4wkQ2SMlDZU97hX86EilU/lUmkQUztTE6mx1EEPh7OmdqBtAvv8HdWpbrJS6tJj3n0CWdM6busNzRV3S9KTYhqvNiqWmuroiKgYhshMjmhTh9ptWhsF7970j/SbMrsPE1suR5z7DMC+P/Hs+y7ijrQAlhyAgccjbhjPygfeBTjzhNqy28EdkUh8C+DU9+z2v/oyeH791OncxHOs5y2AtTc7nb/f73TWPkD/qwBnjX8BoJ98VQNcC+8AAAALSURBVAgdY2AAAgAABQABjbub8wAAAABJRU5ErkJggg=='''
+    __btnImage = None
+
+    @classmethod
+    def makeButton(cls, parent, width, height, text='', fg='black'):
+        if cls.__btnImage is None:
+            cls.__btnImage = PhotoImage(data=cls.__btnImgData)
+            #cls.__btnImage = PhotoImage(file='pics/grayButton_1x1.png')
+        btnImage = cls.__btnImage.zoom(width, height)
+        return Button(master=parent, image=btnImage, text=text, fg=fg, compound='center')
+
+
+    def __init__(self):
+        # Create the main window
+        self.mainWindow = Tk()
+
+        self.mainWindow.minsize(600, 440)
+
+        #load images
+        imgSettingsButton = PhotoImage(file="pics/settingsButton.png")
+        imgInputButton = PhotoImage(file="pics/inputButton.png")
+        #imgOutputButton = PhotoImage(file="pics/outputButton.png")
+        imgOutputButton = PhotoImage(file="pics/clearButton_76x30.png")
+        imgConsoleButton = PhotoImage(file="pics/consoleButton.png")
+
+        # ---------- create the menu frame ----------
+        frameMenu = Frame(self.mainWindow, bg='#e8e8ff', height=40, borderwidth=1, relief='groove')
+        frameMenu.pack(fill=X, expand=False, side=TOP)
+
+        # mnuMenu = Menu(frameMenu) #, width=229, height=30)
+        btnSettings = Button(frameMenu, image=imgSettingsButton)
+        btnInput = Button(frameMenu, image=imgInputButton)
+        lbl = Label(frameMenu, text='2. Output')
+        btnOutput = Button(frameMenu, image=imgOutputButton, text='xxx')
+
+        #style = Style()
+        #style.configure("BW.TLabel", foreground="black", background="white", width=-70, height=-30, bd=1)
+
+        #btnConsole = Button(frameMenu, image=imgConsoleButton)
+        #btnConsole = Button(frameMenu, image=imgOutputButton, text='Console', style="BW.TLabel")
+        btnOutput = self.makeButton(frameMenu, 76, 30, '2. Output', 'black')
+        btnConsole = self.makeButton(frameMenu, 170, 30, 'Console', 'blue')
+
+        #mnuMenu.pack(padY=2, padX=4)
+        #btnSettings.place(x=230, y=2)
+        btnInput.place(x=230+85+4, y=2)
+        btnOutput.place(x=230+85+4+104+4, y=2)
+        btnConsole.place(x=230+85+4+104+4+76+4, y=2)
+
+        # ---------- create the main frame ----------
+        frameMain = Frame(self.mainWindow, bg='#f0f0f0', borderwidth=1, relief='groove')
+        frameMain.pack(fill=BOTH, expand=True, side=TOP)
+
+        # ---------- create the status bar frame ----------
+        frameStatus = Frame(self.mainWindow,  bg='#e8e8ff', height=27, borderwidth=1, relief='groove')
+        frameStatus.pack(fill=BOTH, expand=False, side=TOP)
+
+        # Run the mainloop (required)
+        self.mainWindow.mainloop()
+
+
+
 
 # =======================================================================
 # public static void main(String[] args)
@@ -25,14 +95,19 @@ def main():
     global autoGrader
     console("main...")
 
-    autoGrader = AutoGrader3()
+    #console('%d, %f', 3, 4.3)
+    # TEMP  autoGrader = AutoGrader3()
+
+    controller = Controller()
+
+
 
     # ** THIS IS WHERE WE GATHER THE INFORMATION NORMALLY GATHERED THROUGH THE GUI.
     # THEN, EXECUTE THE GRADING ENGINE
 
         
     #---------- Commit the AG options to the JSON file ----------
-    autoGrader.saveConfiguration()
+    # TEMP autoGrader.saveConfiguration()
     console("Exiting main()...")
 
 main()

@@ -1,6 +1,8 @@
 import os
+import sys
 from IAGConstant import IAGConstant
 from console import console
+from Assignment import Assignment
 #import GradingEngine
 
 
@@ -33,7 +35,7 @@ class MoodlePreprocessor(IAGConstant):
         self.__bAutoUncompress = autoUncompress_;
 
         # ---------- set the language and corresponding file extensions ----------
-        self.setLanguage(language)
+        self.__setLanguage(language)
 
         # ---------- create assignments ArrayList ----------
         '''The key to the assignment files dictionary is the student's name.  The
@@ -82,7 +84,7 @@ class MoodlePreprocessor(IAGConstant):
     # This method sets the programming language and the file extensions
     # list.
     # ======================================================================
-    def setLanguage(self, language_):
+    def __setLanguage(self, language_):
 
         #by default assign language to language_.  This may change below.
         self.__language = language_
@@ -108,20 +110,25 @@ class MoodlePreprocessor(IAGConstant):
     # given the path to a directory, this function returns an array of
     # all sub-directories found in the directoryPath
     # ======================================================================
-    def getSubDirectories(self, directoryPath, omitHiddenDirs):
-        # ---------- get all files in the provided directory ----------
+    def __getSubDirectories(self, directoryPath, omitHiddenDirs):
+        # ---------- get all subdirectories in the provided directory ----------
         dirsInFolder = []
 
-        '''
-        File folder = new File(directoryPath)
-        for (File f : folder.listFiles()) {
-            if (f.isDirectory()) {
-                if (!f.isHidden() || !omitHiddenDirs)
-                    dirsInFolder.add(f)
-            }
-        }
-        return dirsInFolder;
-        '''
+        file_list = os.listdir(directoryPath)
+        for  f in file_list:
+            filepath = os.path.join(directoryPath, f)
+
+            if os.path.isdir(filepath):
+                # for windows
+                # os.stat(filepath).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)
+
+                # for macs
+                if (not f.startswith('.')) or (not omitHiddenDirs):
+                    dirsInFolder.append(filepath)
+
+        #sort the list of sub dirs
+        dirsInFolder.sort()
+        return dirsInFolder
 
 
     # =======================================================================
@@ -129,7 +136,7 @@ class MoodlePreprocessor(IAGConstant):
     # given the path to a directory, this function returns an array of
     # all files and sub-directories found in the directoryPath
     # ======================================================================
-    def getFilesInDirectory(self, directoryPath, omitHiddenFiles):
+    def __getFilesInDirectory(self, directoryPath, omitHiddenFiles):
         # ---------- get all files in the provided directory ----------
         filesInFolder = []  # list of file objects
 
@@ -153,7 +160,7 @@ class MoodlePreprocessor(IAGConstant):
     # private String getFileExtension(String fileName)
     # returns the extension of the given filename.
     # ======================================================================
-    def getFileExtension(self, fileName):
+    def __getFileExtension(self, fileName):
         return os.path.splitext(fileName)[1].lstrip('.')
 
     # =======================================================================
@@ -173,7 +180,7 @@ class MoodlePreprocessor(IAGConstant):
     # private String stripFileExtension(String fileName)
     # returns the extension of the given filename.
     # ======================================================================
-    def stripFileExtension(self, fileName):
+    def __stripFileExtension(self, fileName):
         return os.path.splitext(fileName)[0]
 
 
@@ -183,34 +190,30 @@ class MoodlePreprocessor(IAGConstant):
     # directory with file extension matching any of the extensions on
     # the 'extensions' list.
     # ======================================================================
-    private ArrayList<File> findFilesByExtension(String directory, String[] fileExtensions) {
+    def __findFilesByExtension(self, directory, fileExtensions):
         # ---------- create an empty list of files ----------
-        ArrayList<File> programmingFiles = new ArrayList<File>()
+        programmingFiles = []
 
         # ---------- retrieve a list of all non-hidden files in the directory ----------
-        ArrayList<File> progFiles = getFilesInDirectory(directory, true)
+        progFiles = self.__getFilesInDirectory(directory, True)
 
         # ---------- go through each file in the directory ----------
-        for (File f : progFiles) {
+        for f in progFiles:
             # ---------- we will ignore subdirectories ----------
-            if (f.isFile()) {
+            if os.path.isfile(f):
                 # ---------- retrieve the extension on the file ----------
-                String f_extension = getFileExtension(f).toLowerCase()
+                f_extension = str.lower(self.__getFileExtension(f))
                 #if fileExtensions.contains()
-                if (Arrays.asList(fileExtensions).contains(f_extension))
-                    for (String ext : fileExtensions) {
+                if f_extension in fileExtensions:
+                    for ext in fileExtensions:
                         # ---------- if the extension on the file matches
                         # one of the extension in the extensions list, add
                         # it to the programming files list. ----------
-                        if (f_extension.equals(ext.toLowerCase()))
-                            programmingFiles.add(f)
-                    }
+                        if f_extension == ext.lower():
+                            programmingFiles.append(f)
 
-            }
-        }
+        return programmingFiles
 
-        return programmingFiles;
-    }
 
 
     # =======================================================================
@@ -228,114 +231,102 @@ class MoodlePreprocessor(IAGConstant):
     # 5) At this point, no assignment files were found, return an empty
     # ArrayList.
     # ======================================================================
-    private void findAssignmentFiles(ArrayList<File> files, String directory) {
+    def __findAssignmentFiles(self, files, directory):
 
         # ---------- Step 1: find and uncompress zip files ----------
-        if (bAutoUncompress) {
-            ArrayList<File> compressedFiles = findFilesByExtension(directory, COMPRESSION_EXTENSIONS)
-            for (File cFile : compressedFiles) {
+        if self.__bAutoUncompress:
+            compressedFiles = self.__findFilesByExtension(directory, IAGConstant.COMPRESSION_EXTENSIONS)
+            for cFile in compressedFiles:
                 #uncompress each zip file
-                String[] cmd = {"unzip", "-u", cFile.getAbsolutePath(), "-d", stripFileExtension(cFile.getAbsolutePath())};
-                String cmdStr = "unzip -u \"" + cFile.getAbsolutePath() + "\" -d \"" + stripFileExtension(cFile.getAbsolutePath()) + "\"";
+                # cmd = ["unzip", "-u", os.path.abspath(cFile), "-d", self.__stripFileExtension(os.path.abspath(cFile))]
+                cmdStr = "unzip -u \"" + os.path.abspath(cFile) + "\" -d \"" + self.__stripFileExtension(os.path.abspath(cFile)) + "\""
                 console(cmdStr)
 
-                try {
-                    Runtime r = Runtime.getRuntime()
-                    Process p = r.exec(cmd)        #execute the unzip command
-                    #Process p = r.exec("unzip -u \34/Users/jvolcy/work/test/JordanStill_1124140_assignsubmission_file_/P0502b.zip\34 -d \34/Users/jvolcy/work/test/JordanStill_1124140_assignsubmission_file_/P0502b\34")
-                    p.waitFor()
-                } catch (Exception e) {
-                    console("[findAssignmentFiles()]", e)
-                }
-            }
-        }
+                try:
+                    os.system(cmdStr)      # execute the unzip command
+                    # Process p = r.exec("unzip -u \34/Users/jvolcy/work/test/JordanStill_1124140_assignsubmission_file_/P0502b.zip\34 -d \34/Users/jvolcy/work/test/JordanStill_1124140_assignsubmission_file_/P0502b\34")
+                    # p.waitFor()
+                except:
+                    e = sys.exc_info()[0]
+                    console("findAssignmentFiles(): " + str(e))
+
+
 
         # ---------- Step 2: find programming files in the directory ----------
-        ArrayList<File> programmingFiles = findFilesByExtension(directory, PYTHON_AND_CPP_EXTENSIONS)
-        if (programmingFiles.size() > 0) {
+        programmingFiles = self.__findFilesByExtension(directory, IAGConstant.PYTHON_AND_CPP_EXTENSIONS)
+        if programmingFiles.size() > 0:
             files.addAll(programmingFiles)
             #if we found any files, we are done
-            return;
-        }
+            return
+
 
         # ---------- Step 3: search for sub-directories ----------
-        ArrayList<File> subDirs = getSubDirectories(directory, true)
-        for (File sDir : subDirs) {
+        subDirs = self.__getSubDirectories(directory, True)
+        for sDir in subDirs:
             #Step 4: recursively call findAssignmentFiles() if we find subdirectories
-            findAssignmentFiles(files, sDir.toString())
-        }
+            self.__findAssignmentFiles(files, str(sDir))
+
 
         # ---------- Step 5 ----------
         #No assignment files found.  This may be the end of the recursion.
-    }
+
 
     # =======================================================================
     # private String autoDetectLanguage(ArrayList<File> progFiles)
     #
     # ======================================================================
-    private String autoDetectLanguage(ArrayList<File> progFiles) {
-        for (File f : progFiles) {
-            String f_extension = getFileExtension(f).toLowerCase()
-            if (Arrays.asList(IAGConstant.PYTHON_EXTENSIONS).contains(f_extension)) {
-                return IAGConstant.LANGUAGE_PYTHON3;
-            }
-            if (Arrays.asList(IAGConstant.CPP_EXTENSIONS).contains(f_extension)) {
-                return IAGConstant.LANGUAGE_CPP;
-            }
-        }
+    def __autoDetectLanguage(self,  progFiles):
+        for f in progFiles:
+            f_extension = str.lower(self.__getFileExtension(f))
+            if f_extension in IAGConstant.PYTHON_EXTENSIONS:
+                return IAGConstant.LANGUAGE_PYTHON3
+
+            if f_extension in IAGConstant.CPP_EXTENSIONS:
+                return IAGConstant.LANGUAGE_CPP
+
         return IAGConstant.LANGUAGE_UNKNOWN;
-    }
 
     # =======================================================================
     # private void prepareAssignmentFiles()
     #
     # ======================================================================
-    private void prepareAssignmentFiles() {
-        for (Assignment assignment : assignments) {
+    def __prepareAssignmentFiles(self):
+        for assignment in self.__assignments:
             # ---------- initialize the assignmentFiles array list ----------
-            assignment.assignmentFiles = new ArrayList<>()
+            assignment.assignmentFiles = []
 
             #create a temporary assignment files array list
-            ArrayList<File> assignmentFiles = new ArrayList<>()
+            assignmentFiles = []
 
             # ---------- call the recursive findAssignmentFiles method ----------
-            findAssignmentFiles(assignmentFiles, assignment.assignmentDirectory)
+            self.__findAssignmentFiles(assignmentFiles, assignment.assignmentDirectory)
 
             # ---------- set the language for the assignment ----------
-            if (language.equals( IAGConstant.LANGUAGE_AUTO) ) {
-                assignment.language = autoDetectLanguage(assignmentFiles)
-            }
-            else {
-                assignment.language = language;
-            }
+            if self.__language == IAGConstant.LANGUAGE_AUTO:
+                assignment.language = self.__autoDetectLanguage(assignmentFiles)
+            else:
+                assignment.language = self.__language
 
-            String[] extensions;
+            # extensions = []
 
-            switch (assignment.language) {
-                case IAGConstant.LANGUAGE_PYTHON3:
-                    extensions = IAGConstant.PYTHON_EXTENSIONS;
-                    break;
-                case IAGConstant.LANGUAGE_CPP:
-                    extensions = IAGConstant.CPP_EXTENSIONS;
-                    break;
-                default:        #unable to determine the language
-                    extensions = new String[] {};
-            }
+            if assignment.language == IAGConstant.LANGUAGE_PYTHON3:
+                extensions = IAGConstant.PYTHON_EXTENSIONS
+            elif assignment.language == IAGConstant.LANGUAGE_CPP:
+                extensions = IAGConstant.CPP_EXTENSIONS
+            else:        #unable to determine the language
+                extensions = []
 
             #add only files of the right type to the assignment file list
-            for (File f: assignmentFiles) {
-                String f_extension = getFileExtension(f).toLowerCase()
-                if (Arrays.asList(extensions).contains(f_extension)){
+            for f in assignmentFiles:
+                f_extension = str.lower(self.__getFileExtension(f))
+                if f_extension in extensions:
                         # ---------- if the extension on the file matches
                         # one of the extension in the extensions list, add
                         # it to the programming files list. ----------
-                    assignment.assignmentFiles.add(f)
-                    }
-            }
-                assignment.bAutoGraded = false;     #indicate the assignment has not yet been auto-graded
-        }
+                    assignment.assignmentFiles.append(f)
 
-    }
+            assignment.bAutoGraded = False;     #indicate the assignment has not yet been auto-graded
+
 
 
     # =======================================================================
@@ -345,26 +336,23 @@ class MoodlePreprocessor(IAGConstant):
     # found or null, meaning that the provided directory is not a student
     # assignment directory.
     # ======================================================================
-    private String extractStudentNameFromMoodleDirectoryName(String moodleDirectoryName) {
-        # =assume that directory names that begin with a "_" or a "__" are
-        intended to be hidden or system directories.=
+    def __extractStudentNameFromMoodleDirectoryName(self, moodleDirectoryName):
+        # assume that directory names that begin with a "_" or a "__" are
+        # intended to be hidden or system directories.
 
-        if ( moodleDirectoryName.substring(0,1).equals("_") ) {
-            return null;
-        }
+        if moodleDirectoryName[0:2] == "_":
+            return None
 
-        if (moodleDirectoryName.length() > 1) {
-            if (moodleDirectoryName.substring(0, 2).equals("__")) {
-                return null;
-            }
-        }
+        if len(moodleDirectoryName) > 1:
+            if moodleDirectoryName[0, 3] == "__":
+                return None
 
-        String[] data = moodleDirectoryName.split("_")
-        if (data.length < 2)    #this is an error condition; not a valid Moodle directory name
-            return "";
+        data = moodleDirectoryName.split("_")
+        if len(data) < 2:    # this is an error condition; not a valid Moodle directory name
+            return ""
 
         return data[0];
-    }
+
 
     # =======================================================================
     # private void prepareStudentDirectories()
@@ -387,55 +375,52 @@ class MoodlePreprocessor(IAGConstant):
     # under the TopAssignmentsDirectory.  Each entry should have a valid
     # .studentName and .assignmentDirectory value.
     # ======================================================================
-    private void prepareStudentDirectories() {
+    def __prepareStudentDirectories(self):
         # ---------- get all directories in the top level directory ----------
-        ArrayList<File> listOfFiles = getFilesInDirectory(TopAssignmentsDirectory, true)
+        listOfFiles = self.__getFilesInDirectory(self.__TopAssignmentsDirectory, True)
 
-        # =for directories that don't conform to Moodle names, we will label
-        them "anonymous 1", "anonymous 2", etc...=
-        int anonymousCounter = 1;
+        # for directories that don't conform to Moodle names, we will label
+        # them "anonymous 1", "anonymous 2", etc...=
+        anonymousCounter = 1
 
         # ---------- go through the list and identify subdirectories ----------
-        for (File file : listOfFiles) {
-            if (file.isDirectory()) {     #check that it is a directory
+        for file in listOfFiles:
+            if (os.path.isdir(file)):     #check that it is a directory
 
-                Assignment newAssignment = new Assignment()
+                newAssignment = Assignment()
 
                 #attempt to extract the student's name
-                String studentName = extractStudentNameFromMoodleDirectoryName(file.getName())
+                studentName = self.__extractStudentNameFromMoodleDirectoryName(file.getName())
                 newAssignment.assignmentDirectory = file.toString()
 
 
-                if (studentName == null) {
+                if studentName is None:
                     console("skipping directory " + file.getName())
-                } else if (studentName.equals("")) {
-                    newAssignment.studentName = "Anonymous " + anonymousCounter;
-                    anonymousCounter++;
+                elif studentName == "":
+                    newAssignment.studentName = "Anonymous " + str(anonymousCounter)
+                    anonymousCounter += 1
                     #add this assignment to the assignments ArrayList
-                    assignments.add(newAssignment)
-                } else {
+                    self.__assignments.append(newAssignment)
+                else:
                     #student name successfully extracted: add to the assignmentDirectories dictionary
-                    newAssignment.studentName = studentName;
+                    newAssignment.studentName = studentName
                     #add this assignment to the assignments ArrayList
-                    assignments.add(newAssignment)
-                }
+                    self.__assignments.append(newAssignment)
 
-            }
-        }
-    }
+
+
 
     # =======================================================================
     # public ArrayList<Assignment> getAssignments()
     # This function returns the list of assignments.
     # ======================================================================
-    public ArrayList<Assignment> getAssignments() {
-        return assignments;
-    }
+    def getAssignments(self):
+        return self.__assignments
+
 
     # =======================================================================
     # xxx
     # ======================================================================
-}
 
 
 
