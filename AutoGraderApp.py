@@ -18,68 +18,104 @@ credits = "J Volcy"
 
 # from tkinter import *
 from tkinter import *
+import tkinter.ttk as ttk
 #from tkinter.ttk import Button
-#from tkinter.ttk import Style
+from tkinter.ttk import Style
 
 class Controller(IAGConstant):
 
-    # static class members
-    __btnImgData = '''iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAEGWlDQ1BrQ0dDb2xvclNwYWNlR2VuZXJpY1JHQgAAOI2NVV1oHFUUPrtzZyMkzlNsNIV0qD8NJQ2TVjShtLp/3d02bpZJNtoi6GT27s6Yyc44M7v9oU9FUHwx6psUxL+3gCAo9Q/bPrQvlQol2tQgKD60+INQ6Ium65k7M5lpurHeZe58853vnnvuuWfvBei5qliWkRQBFpquLRcy4nOHj4g9K5CEh6AXBqFXUR0rXalMAjZPC3e1W99Dwntf2dXd/p+tt0YdFSBxH2Kz5qgLiI8B8KdVy3YBevqRHz/qWh72Yui3MUDEL3q44WPXw3M+fo1pZuQs4tOIBVVTaoiXEI/MxfhGDPsxsNZfoE1q66ro5aJim3XdoLFw72H+n23BaIXzbcOnz5mfPoTvYVz7KzUl5+FRxEuqkp9G/Ajia219thzg25abkRE/BpDc3pqvphHvRFys2weqvp+krbWKIX7nhDbzLOItiM8358pTwdirqpPFnMF2xLc1WvLyOwTAibpbmvHHcvttU57y5+XqNZrLe3lE/Pq8eUj2fXKfOe3pfOjzhJYtB/yll5SDFcSDiH+hRkH25+L+sdxKEAMZahrlSX8ukqMOWy/jXW2m6M9LDBc31B9LFuv6gVKg/0Szi3KAr1kGq1GMjU/aLbnq6/lRxc4XfJ98hTargX++DbMJBSiYMIe9Ck1YAxFkKEAG3xbYaKmDDgYyFK0UGYpfoWYXG+fAPPI6tJnNwb7ClP7IyF+D+bjOtCpkhz6CFrIa/I6sFtNl8auFXGMTP34sNwI/JhkgEtmDz14ySfaRcTIBInmKPE32kxyyE2Tv+thKbEVePDfW/byMM1Kmm0XdObS7oGD/MypMXFPXrCwOtoYjyyn7BV29/MZfsVzpLDdRtuIZnbpXzvlf+ev8MvYr/Gqk4H/kV/G3csdazLuyTMPsbFhzd1UabQbjFvDRmcWJxR3zcfHkVw9GfpbJmeev9F08WW8uDkaslwX6avlWGU6NRKz0g/SHtCy9J30o/ca9zX3Kfc19zn3BXQKRO8ud477hLnAfc1/G9mrzGlrfexZ5GLdn6ZZrrEohI2wVHhZywjbhUWEy8icMCGNCUdiBlq3r+xafL549HQ5jH+an+1y+LlYBifuxAvRN/lVVVOlwlCkdVm9NOL5BE4wkQ2SMlDZU97hX86EilU/lUmkQUztTE6mx1EEPh7OmdqBtAvv8HdWpbrJS6tJj3n0CWdM6busNzRV3S9KTYhqvNiqWmuroiKgYhshMjmhTh9ptWhsF7970j/SbMrsPE1suR5z7DMC+P/Hs+y7ijrQAlhyAgccjbhjPygfeBTjzhNqy28EdkUh8C+DU9+z2v/oyeH791OncxHOs5y2AtTc7nb/f73TWPkD/qwBnjX8BoJ98VQNcC+8AAAALSURBVAgdY2AAAgAABQABjbub8wAAAABJRU5ErkJggg=='''
-    __btnImage = None
+    # static class of enumerated button image types
+    class BTN_IMG_TYPE(object):
+        CLEAR = 0
+        LIGHT_GRAY = 1
+        LIGHT_BLUE = 2
 
-    @classmethod
-    def makeButton(cls, parent, width, height, text='', fg='black'):
-        if cls.__btnImage is None:
-            cls.__btnImage = PhotoImage(data=cls.__btnImgData)
-            #cls.__btnImage = PhotoImage(file='pics/grayButton_1x1.png')
-        btnImage = cls.__btnImage.zoom(width, height)
-        return Button(master=parent, image=btnImage, text=text, fg=fg, compound='center')
+    # class constants
+    MAIN_WND_MIN_WIDTH = 600
+    MAIN_WND_MIN_HEIGHT = 440
 
+    def makeButtonImage(self, width, height, btnType=BTN_IMG_TYPE.CLEAR):
+        if btnType == self.BTN_IMG_TYPE.LIGHT_GRAY:
+            # request for light gray button
+            return self.__lightGrayBtnImg.zoom(width, height)
+        elif btnType == self.BTN_IMG_TYPE.LIGHT_BLUE:
+            # request for light blue button
+            return self.__lightBlueBtnImg.zoom(width, height)
+        else:
+            # default: return clear button
+            return self.__clearBtnImg.zoom(width, height)
+
+    def __buildMenuFrame(self):
+        self.__menubar = Menu(self.__frameMenu)
+        self.__filemenu = Menu(self.__menubar, tearoff=0)
+        self.__filemenu.add_command(label="New", command=None)
+        self.__filemenu.add_command(label="Open", command=None)
+        self.__filemenu.add_command(label="Save", command=None)
+        self.__filemenu.add_separator()
+        self.__filemenu.add_command(label="Exit", command=self.mainWindow.quit)
+        self.__menubar.add_cascade(label="File", menu=self.__filemenu)
+
+        self.__helpmenu = Menu(self.__menubar, tearoff=0)
+        self.__helpmenu.add_command(label="Help Index", command=None)
+        self.__helpmenu.add_command(label="About...", command=None)
+        self.__menubar.add_cascade(label="Help", menu=self.__helpmenu)
+
+        self.mainWindow.config(menu=self.__menubar)
+
+        self.imgBtnSettings = self.makeButtonImage(85, 30)
+        self.btnSettings = Button(self.__frameMenu, fg='black', text="0. Settings", image=self.imgBtnSettings, compound="center")
+        self.btnSettings.pack(side='left')
+
+        self.imgBtnInput = self.makeButtonImage(104, 30)
+        self.btnInput = Button(self.__frameMenu, fg='black', text="1. Input/Setup", image=self.imgBtnInput, compound="center")
+        self.btnInput.pack(side='left')
+
+        self.imgBtnOutput = self.makeButtonImage(76, 30)
+        self.btnOutput = Button(self.__frameMenu, fg='black', text="2. Output", image=self.imgBtnOutput, compound="center")
+        self.btnOutput.pack(side='left')
+
+        self.imgBtnConsole = self.makeButtonImage(70, 30, self.BTN_IMG_TYPE.LIGHT_BLUE)
+        self.btnConsole = Button(self.__frameMenu, fg='blue', text="Console", image=self.imgBtnConsole, compound="center")
+        self.btnConsole.pack(side='left')
+
+    def __buildStatusFrame(self):
+        self.lblReady = Label(self.__frameStatus, text='Ready', width=200, bg='yellow')
+        self.lblReady.pack(side='left')
+
+        #self.__lblMessage
+        #self.__lblLanguage
 
     def __init__(self):
-        # Create the main window
+        # ---------- create button images ----------
+        # Base64 image encodings from https://www.base64-image.de
+        self.__clearPixelData = '''iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAEGWlDQ1BrQ0dDb2xvclNwYWNlR2VuZXJpY1JHQgAAOI2NVV1oHFUUPrtzZyMkzlNsNIV0qD8NJQ2TVjShtLp/3d02bpZJNtoi6GT27s6Yyc44M7v9oU9FUHwx6psUxL+3gCAo9Q/bPrQvlQol2tQgKD60+INQ6Ium65k7M5lpurHeZe58853vnnvuuWfvBei5qliWkRQBFpquLRcy4nOHj4g9K5CEh6AXBqFXUR0rXalMAjZPC3e1W99Dwntf2dXd/p+tt0YdFSBxH2Kz5qgLiI8B8KdVy3YBevqRHz/qWh72Yui3MUDEL3q44WPXw3M+fo1pZuQs4tOIBVVTaoiXEI/MxfhGDPsxsNZfoE1q66ro5aJim3XdoLFw72H+n23BaIXzbcOnz5mfPoTvYVz7KzUl5+FRxEuqkp9G/Ajia219thzg25abkRE/BpDc3pqvphHvRFys2weqvp+krbWKIX7nhDbzLOItiM8358pTwdirqpPFnMF2xLc1WvLyOwTAibpbmvHHcvttU57y5+XqNZrLe3lE/Pq8eUj2fXKfOe3pfOjzhJYtB/yll5SDFcSDiH+hRkH25+L+sdxKEAMZahrlSX8ukqMOWy/jXW2m6M9LDBc31B9LFuv6gVKg/0Szi3KAr1kGq1GMjU/aLbnq6/lRxc4XfJ98hTargX++DbMJBSiYMIe9Ck1YAxFkKEAG3xbYaKmDDgYyFK0UGYpfoWYXG+fAPPI6tJnNwb7ClP7IyF+D+bjOtCpkhz6CFrIa/I6sFtNl8auFXGMTP34sNwI/JhkgEtmDz14ySfaRcTIBInmKPE32kxyyE2Tv+thKbEVePDfW/byMM1Kmm0XdObS7oGD/MypMXFPXrCwOtoYjyyn7BV29/MZfsVzpLDdRtuIZnbpXzvlf+ev8MvYr/Gqk4H/kV/G3csdazLuyTMPsbFhzd1UabQbjFvDRmcWJxR3zcfHkVw9GfpbJmeev9F08WW8uDkaslwX6avlWGU6NRKz0g/SHtCy9J30o/ca9zX3Kfc19zn3BXQKRO8ud477hLnAfc1/G9mrzGlrfexZ5GLdn6ZZrrEohI2wVHhZywjbhUWEy8icMCGNCUdiBlq3r+xafL549HQ5jH+an+1y+LlYBifuxAvRN/lVVVOlwlCkdVm9NOL5BE4wkQ2SMlDZU97hX86EilU/lUmkQUztTE6mx1EEPh7OmdqBtAvv8HdWpbrJS6tJj3n0CWdM6busNzRV3S9KTYhqvNiqWmuroiKgYhshMjmhTh9ptWhsF7970j/SbMrsPE1suR5z7DMC+P/Hs+y7ijrQAlhyAgccjbhjPygfeBTjzhNqy28EdkUh8C+DU9+z2v/oyeH791OncxHOs5y2AtTc7nb/f73TWPkD/qwBnjX8BoJ98VQNcC+8AAAALSURBVAgdY2AAAgAABQABjbub8wAAAABJRU5ErkJggg=='''
+        self.__lightGrayPixelData = '''iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAEGWlDQ1BrQ0dDb2xvclNwYWNlR2VuZXJpY1JHQgAAOI2NVV1oHFUUPrtzZyMkzlNsNIV0qD8NJQ2TVjShtLp/3d02bpZJNtoi6GT27s6Yyc44M7v9oU9FUHwx6psUxL+3gCAo9Q/bPrQvlQol2tQgKD60+INQ6Ium65k7M5lpurHeZe58853vnnvuuWfvBei5qliWkRQBFpquLRcy4nOHj4g9K5CEh6AXBqFXUR0rXalMAjZPC3e1W99Dwntf2dXd/p+tt0YdFSBxH2Kz5qgLiI8B8KdVy3YBevqRHz/qWh72Yui3MUDEL3q44WPXw3M+fo1pZuQs4tOIBVVTaoiXEI/MxfhGDPsxsNZfoE1q66ro5aJim3XdoLFw72H+n23BaIXzbcOnz5mfPoTvYVz7KzUl5+FRxEuqkp9G/Ajia219thzg25abkRE/BpDc3pqvphHvRFys2weqvp+krbWKIX7nhDbzLOItiM8358pTwdirqpPFnMF2xLc1WvLyOwTAibpbmvHHcvttU57y5+XqNZrLe3lE/Pq8eUj2fXKfOe3pfOjzhJYtB/yll5SDFcSDiH+hRkH25+L+sdxKEAMZahrlSX8ukqMOWy/jXW2m6M9LDBc31B9LFuv6gVKg/0Szi3KAr1kGq1GMjU/aLbnq6/lRxc4XfJ98hTargX++DbMJBSiYMIe9Ck1YAxFkKEAG3xbYaKmDDgYyFK0UGYpfoWYXG+fAPPI6tJnNwb7ClP7IyF+D+bjOtCpkhz6CFrIa/I6sFtNl8auFXGMTP34sNwI/JhkgEtmDz14ySfaRcTIBInmKPE32kxyyE2Tv+thKbEVePDfW/byMM1Kmm0XdObS7oGD/MypMXFPXrCwOtoYjyyn7BV29/MZfsVzpLDdRtuIZnbpXzvlf+ev8MvYr/Gqk4H/kV/G3csdazLuyTMPsbFhzd1UabQbjFvDRmcWJxR3zcfHkVw9GfpbJmeev9F08WW8uDkaslwX6avlWGU6NRKz0g/SHtCy9J30o/ca9zX3Kfc19zn3BXQKRO8ud477hLnAfc1/G9mrzGlrfexZ5GLdn6ZZrrEohI2wVHhZywjbhUWEy8icMCGNCUdiBlq3r+xafL549HQ5jH+an+1y+LlYBifuxAvRN/lVVVOlwlCkdVm9NOL5BE4wkQ2SMlDZU97hX86EilU/lUmkQUztTE6mx1EEPh7OmdqBtAvv8HdWpbrJS6tJj3n0CWdM6busNzRV3S9KTYhqvNiqWmuroiKgYhshMjmhTh9ptWhsF7970j/SbMrsPE1suR5z7DMC+P/Hs+y7ijrQAlhyAgccjbhjPygfeBTjzhNqy28EdkUh8C+DU9+z2v/oyeH791OncxHOs5y2AtTc7nb/f73TWPkD/qwBnjX8BoJ98VQNcC+8AAAAKSURBVAgdY3gGAADoAOegvBZqAAAAAElFTkSuQmCC'''
+        self.__lightBluePixelData = '''iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAEGWlDQ1BrQ0dDb2xvclNwYWNlR2VuZXJpY1JHQgAAOI2NVV1oHFUUPrtzZyMkzlNsNIV0qD8NJQ2TVjShtLp/3d02bpZJNtoi6GT27s6Yyc44M7v9oU9FUHwx6psUxL+3gCAo9Q/bPrQvlQol2tQgKD60+INQ6Ium65k7M5lpurHeZe58853vnnvuuWfvBei5qliWkRQBFpquLRcy4nOHj4g9K5CEh6AXBqFXUR0rXalMAjZPC3e1W99Dwntf2dXd/p+tt0YdFSBxH2Kz5qgLiI8B8KdVy3YBevqRHz/qWh72Yui3MUDEL3q44WPXw3M+fo1pZuQs4tOIBVVTaoiXEI/MxfhGDPsxsNZfoE1q66ro5aJim3XdoLFw72H+n23BaIXzbcOnz5mfPoTvYVz7KzUl5+FRxEuqkp9G/Ajia219thzg25abkRE/BpDc3pqvphHvRFys2weqvp+krbWKIX7nhDbzLOItiM8358pTwdirqpPFnMF2xLc1WvLyOwTAibpbmvHHcvttU57y5+XqNZrLe3lE/Pq8eUj2fXKfOe3pfOjzhJYtB/yll5SDFcSDiH+hRkH25+L+sdxKEAMZahrlSX8ukqMOWy/jXW2m6M9LDBc31B9LFuv6gVKg/0Szi3KAr1kGq1GMjU/aLbnq6/lRxc4XfJ98hTargX++DbMJBSiYMIe9Ck1YAxFkKEAG3xbYaKmDDgYyFK0UGYpfoWYXG+fAPPI6tJnNwb7ClP7IyF+D+bjOtCpkhz6CFrIa/I6sFtNl8auFXGMTP34sNwI/JhkgEtmDz14ySfaRcTIBInmKPE32kxyyE2Tv+thKbEVePDfW/byMM1Kmm0XdObS7oGD/MypMXFPXrCwOtoYjyyn7BV29/MZfsVzpLDdRtuIZnbpXzvlf+ev8MvYr/Gqk4H/kV/G3csdazLuyTMPsbFhzd1UabQbjFvDRmcWJxR3zcfHkVw9GfpbJmeev9F08WW8uDkaslwX6avlWGU6NRKz0g/SHtCy9J30o/ca9zX3Kfc19zn3BXQKRO8ud477hLnAfc1/G9mrzGlrfexZ5GLdn6ZZrrEohI2wVHhZywjbhUWEy8icMCGNCUdiBlq3r+xafL549HQ5jH+an+1y+LlYBifuxAvRN/lVVVOlwlCkdVm9NOL5BE4wkQ2SMlDZU97hX86EilU/lUmkQUztTE6mx1EEPh7OmdqBtAvv8HdWpbrJS6tJj3n0CWdM6busNzRV3S9KTYhqvNiqWmuroiKgYhshMjmhTh9ptWhsF7970j/SbMrsPE1suR5z7DMC+P/Hs+y7ijrQAlhyAgccjbhjPygfeBTjzhNqy28EdkUh8C+DU9+z2v/oyeH791OncxHOs5y2AtTc7nb/f73TWPkD/qwBnjX8BoJ98VQNcC+8AAAAMSURBVAgdY5h08REABD4CRkzI4LsAAAAASUVORK5CYII='''
+
+        # ---------- Create the main window & set its minimum dimensions ----------
         self.mainWindow = Tk()
+        self.mainWindow.minsize(self.MAIN_WND_MIN_WIDTH, self.MAIN_WND_MIN_HEIGHT)
+        self.mainWindow.title('Spelman AutoGrader 2.X')
 
-        self.mainWindow.minsize(600, 440)
+        # ---------- create the main window frames ----------
+        self.__frameMenu = Frame(self.mainWindow, bg='#e8e8ff', height=40, borderwidth=1, relief='groove')
+        self.__frameMain = Frame(self.mainWindow, bg='#f0f0f0', borderwidth=1, relief='groove')
+        self.__frameStatus = Frame(self.mainWindow,  bg='#e8e8ff', height=27, borderwidth=1, relief='groove')
 
-        #load images
-        imgSettingsButton = PhotoImage(file="pics/settingsButton.png")
-        imgInputButton = PhotoImage(file="pics/inputButton.png")
-        #imgOutputButton = PhotoImage(file="pics/outputButton.png")
-        imgOutputButton = PhotoImage(file="pics/clearButton_76x30.png")
-        imgConsoleButton = PhotoImage(file="pics/consoleButton.png")
+        # ---------- create button images ----------
+        self.__clearBtnImg = PhotoImage(data=self.__clearPixelData)
+        self.__lightGrayBtnImg = PhotoImage(data=self.__lightGrayPixelData)
+        self.__lightBlueBtnImg = PhotoImage(data=self.__lightBluePixelData)
 
-        # ---------- create the menu frame ----------
-        frameMenu = Frame(self.mainWindow, bg='#e8e8ff', height=40, borderwidth=1, relief='groove')
-        frameMenu.pack(fill=X, expand=False, side=TOP)
+        # ---------- create the main frames ----------
+        self.__buildMenuFrame()
+        self.__buildStatusFrame()
 
-        # mnuMenu = Menu(frameMenu) #, width=229, height=30)
-        btnSettings = Button(frameMenu, image=imgSettingsButton)
-        btnInput = Button(frameMenu, image=imgInputButton)
-        lbl = Label(frameMenu, text='2. Output')
-        btnOutput = Button(frameMenu, image=imgOutputButton, text='xxx')
 
-        #style = Style()
-        #style.configure("BW.TLabel", foreground="black", background="white", width=-70, height=-30, bd=1)
-
-        #btnConsole = Button(frameMenu, image=imgConsoleButton)
-        #btnConsole = Button(frameMenu, image=imgOutputButton, text='Console', style="BW.TLabel")
-        btnOutput = self.makeButton(frameMenu, 76, 30, '2. Output', 'black')
-        btnConsole = self.makeButton(frameMenu, 170, 30, 'Console', 'blue')
-
-        #mnuMenu.pack(padY=2, padX=4)
-        #btnSettings.place(x=230, y=2)
-        btnInput.place(x=230+85+4, y=2)
-        btnOutput.place(x=230+85+4+104+4, y=2)
-        btnConsole.place(x=230+85+4+104+4+76+4, y=2)
-
-        # ---------- create the main frame ----------
-        frameMain = Frame(self.mainWindow, bg='#f0f0f0', borderwidth=1, relief='groove')
-        frameMain.pack(fill=BOTH, expand=True, side=TOP)
-
-        # ---------- create the status bar frame ----------
-        frameStatus = Frame(self.mainWindow,  bg='#e8e8ff', height=27, borderwidth=1, relief='groove')
-        frameStatus.pack(fill=BOTH, expand=False, side=TOP)
+        # ---------- pack in the main window frames ----------
+        self.__frameMenu.pack(fill=X, expand=False, side=TOP)
+        self.__frameMain.pack(fill=BOTH, expand=True, side=TOP)
+        self.__frameStatus.pack(fill=X, expand=False, side=TOP)
 
         # Run the mainloop (required)
         self.mainWindow.mainloop()
