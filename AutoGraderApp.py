@@ -19,32 +19,46 @@ credits = "J Volcy"
 # from tkinter import *
 from tkinter import *
 import tkinter.ttk as ttk
-#from tkinter.ttk import Button
-from tkinter.ttk import Style
+from tkinter import font
 
 class Controller(IAGConstant):
 
+    # =======================================================================
     # static class of enumerated button image types
-    class BTN_IMG_TYPE(object):
+    # ======================================================================
+    class WIDGET_CLR(object):
         CLEAR = 0
         LIGHT_GRAY = 1
         LIGHT_BLUE = 2
+        BLUE_GRAY = 3
 
     # class constants
     MAIN_WND_MIN_WIDTH = 600
     MAIN_WND_MIN_HEIGHT = 440
 
-    def makeButtonImage(self, width, height, btnType=BTN_IMG_TYPE.CLEAR):
-        if btnType == self.BTN_IMG_TYPE.LIGHT_GRAY:
+    # =======================================================================
+    #
+    #
+    # ======================================================================
+    def makeWidgetImage(self, width, height, widgetClr=WIDGET_CLR.CLEAR):
+        if widgetClr == self.WIDGET_CLR.LIGHT_GRAY:
             # request for light gray button
-            return self.__lightGrayBtnImg.zoom(width, height)
-        elif btnType == self.BTN_IMG_TYPE.LIGHT_BLUE:
+            return self.__lightGrayPixelImg.zoom(width, height)
+        elif widgetClr == self.WIDGET_CLR.LIGHT_BLUE:
             # request for light blue button
-            return self.__lightBlueBtnImg.zoom(width, height)
+            return self.__lightBluePixelImg.zoom(width, height)
+        elif widgetClr == self.WIDGET_CLR.BLUE_GRAY:
+            #request for light blue gray
+            return self.__blueGrayPixelImg.zoom(width, height)
         else:
             # default: return clear button
-            return self.__clearBtnImg.zoom(width, height)
+            return self.__clearPixelImg.zoom(width, height)
 
+
+    # =======================================================================
+    #
+    #
+    # ======================================================================
     def __buildMenuFrame(self):
         self.__menubar = Menu(self.__frameMenu)
         self.__filemenu = Menu(self.__menubar, tearoff=0)
@@ -62,55 +76,219 @@ class Controller(IAGConstant):
 
         self.mainWindow.config(menu=self.__menubar)
 
-        self.imgBtnSettings = self.makeButtonImage(85, 30)
-        self.btnSettings = Button(self.__frameMenu, fg='black', text="0. Settings", image=self.imgBtnSettings, compound="center")
+        self.btnSettings = Button(self.__frameMenu, fg='black', text="0. Settings", image=self.imgBtn_85x30, compound="center", command=self.__btnSettingClick)
         self.btnSettings.pack(side='left')
 
-        self.imgBtnInput = self.makeButtonImage(104, 30)
-        self.btnInput = Button(self.__frameMenu, fg='black', text="1. Input/Setup", image=self.imgBtnInput, compound="center")
+        self.btnInput = Button(self.__frameMenu, fg='black', text="1. Input/Setup", image=self.imgBtn_100x30, compound="center", command=self.__btnInputClick)
         self.btnInput.pack(side='left')
 
-        self.imgBtnOutput = self.makeButtonImage(76, 30)
-        self.btnOutput = Button(self.__frameMenu, fg='black', text="2. Output", image=self.imgBtnOutput, compound="center")
+        self.btnOutput = Button(self.__frameMenu, fg='black', text="2. Output", image=self.imgBtn_76x30, compound="center")
         self.btnOutput.pack(side='left')
 
-        self.imgBtnConsole = self.makeButtonImage(70, 30, self.BTN_IMG_TYPE.LIGHT_BLUE)
-        self.btnConsole = Button(self.__frameMenu, fg='blue', text="Console", image=self.imgBtnConsole, compound="center")
+        self.btnConsole = Button(self.__frameMenu, fg='blue', text="Console", image=self.imgBlueBtn_76x30, compound="center")
         self.btnConsole.pack(side='left')
 
+    # =======================================================================
+    #
+    #
+    # ======================================================================
+    def __buildMainFrames(self):
+        # build Settings frame
+        self.__buildSettingsFrame()
+        #self.__settingsFrame.place(x=24, y=0)
+
+        # build Input frame
+        self.__buildInputFrame()
+        # build Output frame
+        # build Console frame
+        # build Help frame
+
+
+
+    # =======================================================================
+    #
+    #
+    # ======================================================================
     def __buildStatusFrame(self):
-        self.lblReady = Label(self.__frameStatus, text='Ready', width=200, bg='yellow')
+        self.imgLblReady = self.makeWidgetImage(100, 27, self.WIDGET_CLR.BLUE_GRAY)
+        self.lblReady = Label(self.__frameStatus, fg='black', text='Ready', image=self.imgLblReady, compound='center', borderwidth=0, padx=0, pady=0)
         self.lblReady.pack(side='left')
 
-        #self.__lblMessage
-        #self.__lblLanguage
+        self.lblMessage = Label(self.__frameStatus, bg='#e8e8ff', fg='blue', text='AutoGrader 2.X', borderwidth=0, padx=0, pady=0)
+        self.lblMessage.pack(fill=X, expand=True, side='left')
 
+        self.imgLblLanguage = self.makeWidgetImage(120, 27, self.WIDGET_CLR.BLUE_GRAY)
+        self.lblLanguage = Label(self.__frameStatus, fg='purple', text='Auto', image=self.imgLblLanguage, compound='center', borderwidth=0, padx=0, pady=0)
+        self.lblLanguage.pack(side='left')
+
+
+    # =======================================================================
+    # The settings frame consists of 9 sub "entry frames".  Each of these contains
+    # a label and some sort of input widget.  The labels are all 240 pixels wide
+    #
+    # ======================================================================
+    def __buildSettingsFrame(self):
+        self.__settingsFrame = Frame(self.__frameMain, bg='#f0f0f0')
+        self.__settingsFrame.place(x=24, y=0)
+        #self.imgEntryLabel = self.makeWidgetImage(240, 27, self.WIDGET_CLR.LIGHT_GRAY)
+
+        settingLabels = ['Language', 'Max Run Time, sec (0 = no limit)', 'Limit output to this many lines:',
+                         'Include source listing in output', 'Auto-uncompress zip files',
+                         'Process recursively', 'Python 3 interpreter', 'C++ compiler', 'Shell interpreter']
+
+        self.__entryFrames = []    # list to contain entry frames
+        for i in range(9):
+            self.__entryFrames.append(Frame(self.__settingsFrame, bg='#f0f0f0', width=552, height=27, highlightthickness=1, highlightbackground='lightgray', relief='flat'))
+            self.__entryFrames[i].pack(side='top', pady=4, ipady=2)
+            #Label(self.__entryFrames[i], text=settingLabels[i], image=self.imgEntryLabel, bg='#f0f0f0', borderwidth=0, compound='center').place(x=0, y=0) #pack(side='left')
+            Label(self.__entryFrames[i], text=settingLabels[i], bg='#f0f0f0', borderwidth=0).place(x=0, y=4, width=240) #pack(side='left')
+
+
+        # now, individually create the different entry widgets
+
+        # 0 'Language'
+        self.comboLanguage = ttk.Combobox(self.__entryFrames[0], values=[ "Auto", "Python 3", "C++"])
+        self.comboLanguage.place(x=244, y=2, width=200)
+
+        # 1 'Max Run Time, sec (0 = no limit)'
+        self.spinMaxRun = Spinbox(self.__entryFrames[1], from_=0, to=1000, highlightthickness=1, highlightbackground='lightgray', relief='flat')
+        self.spinMaxRun.place(x=244, y=2, width=200)
+
+        # 2 'Limit output to this many lines:'
+        self.spinMaxOutputLines = Spinbox(self.__entryFrames[2], from_=1, to=10000, highlightthickness=1, highlightbackground='lightgray', relief='flat')
+        self.spinMaxOutputLines.place(x=244, y=2, width=200)
+
+        # 3 'Include source listing in output'
+        self.comboOutputSource = ttk.Combobox(self.__entryFrames[3], values=[ "Yes", "No"])
+        self.comboOutputSource.place(x=244, y=2, width=200)
+
+        # 4 'Auto-uncompress zip files'
+        self.comboAutoUncompress = ttk.Combobox(self.__entryFrames[4], values=[ "Yes", "No"])
+        self.comboAutoUncompress.place(x=244, y=2, width=200)
+
+        # 5 'Process recursively'
+        #self.__entryFrames[5].option_add("*TCombobox*Listbox*Background", 'green')
+        #self.__entryFrames[5].option_add("*TCombobox*background", 'red')
+        self.comboProcessRecursively = ttk.Combobox(self.__entryFrames[5], values=[ "Yes", "No"])
+        self.comboProcessRecursively.place(x=244, y=2, width=200)
+
+        # 6 'Python 3 interpreter'
+        self.pythonInterpreter = StringVar(self.__entryFrames[6], value='---')
+        self.__entryPythonInterpreter =  Entry(self.__entryFrames[6], textvariable=self.pythonInterpreter)
+        self.__entryPythonInterpreter.place(x=244, y=0, width=304) #pack(expand=True, fill='both')  # .pack(side='left', expand=False, fill="x")
+
+        # 7 'C++ compiler'
+        self.cppCompiler = StringVar(self.__entryFrames[7], value='---')
+        self.__entryCppCompiler =  Entry(self.__entryFrames[7], textvariable=self.cppCompiler)
+        self.__entryCppCompiler.place(x=244, y=0, width=304) #pack(expand=True, fill='both')  # .pack(side='left', expand=False, fill="x")
+
+        # 8 'Shell interpreter'
+        self.shell = StringVar(self.__entryFrames[8], value='---')
+        self.__entryShell = Entry(self.__entryFrames[8], textvariable=self.shell)
+        self.__entryShell.place(x=244, y=0, width=304) #.pack(side="left",fill="x", expand=False, ipady=3, ipadx=3) #.pack(side='left', expand=False, fill="x")
+
+
+    # =======================================================================
+    #
+    #
+    # ======================================================================
+    def __buildInputFrame(self):
+        self.__inputFrame = Frame(self.__frameMain, bg='#f0f0f0')
+        self.__inputFrame.pack(expand=True, fill='both') #place(x=0, y=0, width=400)
+
+        self.btnStart = Button(self.__inputFrame, fg='blue', text="Start", image=self.imgBtn_100x50, compound="center", command=None)
+        self.btnStart.place(x=454, y=67)
+
+        self.btnSourceDir = Button(self.__inputFrame, fg='black', text="Source Directory", image=self.imgBtn_150x30, compound="center", command=None)
+        self.btnSourceDir.place(x=39, y=28)
+
+        self.sourceDir = StringVar(self.__inputFrame, value='---')
+        self.__entrysourceDir =  Entry(self.__inputFrame, textvariable=self.sourceDir)
+        self.__entrysourceDir.place(x=200, y=31, width=360)
+
+        self.btnTestAdd = Button(self.__inputFrame, fg='black', text="Add", image=self.imgBtn_76x30, compound="center", command=None)
+        self.btnTestAdd.place(x=39, y=136)
+
+        self.btnTestRemove = Button(self.__inputFrame, fg='black', text="Remove", image=self.imgBtn_76x30, compound="center", command=None)
+        self.btnTestRemove.place(x=39, y=170)
+
+        self.btnDataAdd = Button(self.__inputFrame, fg='black', text="Add", image=self.imgBtn_76x30, compound="center", command=None)
+        self.btnDataAdd.place(x=39, y=252)
+
+        self.btnDataRemove = Button(self.__inputFrame, fg='black', text="Remove", image=self.imgBtn_76x30, compound="center", command=None)
+        self.btnDataRemove.place(x=39, y=286)
+
+        # Add list boxes
+        self.listTestData = Listbox(self.__inputFrame, selectmode=EXTENDED, height=5)
+        self.listTestData.place(x=134, y=128, width=420)
+
+        self.listDataFiles = Listbox(self.__inputFrame, selectmode=EXTENDED, height=4)
+        self.listDataFiles.place(x=134, y=243, width=420)
+
+        # Add misc anonymous labels
+        Label(self.__inputFrame, bg='#f0f0f0', fg='black', text='Test Data', borderwidth=0, padx=0, pady=0, font = ("helvetica", 14, "bold italic")).place(x=42, y=116)
+        Label(self.__inputFrame, bg='#f0f0f0', fg='black', text='Data Files', borderwidth=0, padx=0, pady=0, font = ("helvetica", 14, "bold italic")).place(x=39, y=232)
+        Label(self.__inputFrame, bg='#f0f0f0', fg='black', text='Test data files substitute for keyboard inputs to the programs under test.', borderwidth=0, padx=0, pady=0, font = ("helvetica", 12, "italic")).place(x=139, y=215)
+        Label(self.__inputFrame, bg='#f0f0f0', fg='black', text='Data files are files that may need to be read by the programs under test.', borderwidth=0, padx=0, pady=0, font = ("helvetica", 12, "italic")).place(x=139, y=315)
+
+    # =======================================================================
+    #
+    #
+    # ======================================================================
+    def __buildOutputFrame(self):
+        self.__outputFrame = Frame(self.__frameMain, bg='#f0f0f0')
+        self.__outputFrame.pack(expand=True, fill='both') #place(x=0, y=0, width=400)
+
+        # make images for the different buttons
+        self.imgBtn_150x30 = self.makeWidgetImage(154, 30)
+        self.imgBtn_76x30 = self.makeWidgetImage(70, 30)
+        self.imgBtn_100x50 = self.makeWidgetImage(100, 50)
+
+    # =======================================================================
+    #
+    #
+    # ======================================================================
     def __init__(self):
-        # ---------- create button images ----------
+        # ---------- defint pixel images ----------
         # Base64 image encodings from https://www.base64-image.de
         self.__clearPixelData = '''iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAEGWlDQ1BrQ0dDb2xvclNwYWNlR2VuZXJpY1JHQgAAOI2NVV1oHFUUPrtzZyMkzlNsNIV0qD8NJQ2TVjShtLp/3d02bpZJNtoi6GT27s6Yyc44M7v9oU9FUHwx6psUxL+3gCAo9Q/bPrQvlQol2tQgKD60+INQ6Ium65k7M5lpurHeZe58853vnnvuuWfvBei5qliWkRQBFpquLRcy4nOHj4g9K5CEh6AXBqFXUR0rXalMAjZPC3e1W99Dwntf2dXd/p+tt0YdFSBxH2Kz5qgLiI8B8KdVy3YBevqRHz/qWh72Yui3MUDEL3q44WPXw3M+fo1pZuQs4tOIBVVTaoiXEI/MxfhGDPsxsNZfoE1q66ro5aJim3XdoLFw72H+n23BaIXzbcOnz5mfPoTvYVz7KzUl5+FRxEuqkp9G/Ajia219thzg25abkRE/BpDc3pqvphHvRFys2weqvp+krbWKIX7nhDbzLOItiM8358pTwdirqpPFnMF2xLc1WvLyOwTAibpbmvHHcvttU57y5+XqNZrLe3lE/Pq8eUj2fXKfOe3pfOjzhJYtB/yll5SDFcSDiH+hRkH25+L+sdxKEAMZahrlSX8ukqMOWy/jXW2m6M9LDBc31B9LFuv6gVKg/0Szi3KAr1kGq1GMjU/aLbnq6/lRxc4XfJ98hTargX++DbMJBSiYMIe9Ck1YAxFkKEAG3xbYaKmDDgYyFK0UGYpfoWYXG+fAPPI6tJnNwb7ClP7IyF+D+bjOtCpkhz6CFrIa/I6sFtNl8auFXGMTP34sNwI/JhkgEtmDz14ySfaRcTIBInmKPE32kxyyE2Tv+thKbEVePDfW/byMM1Kmm0XdObS7oGD/MypMXFPXrCwOtoYjyyn7BV29/MZfsVzpLDdRtuIZnbpXzvlf+ev8MvYr/Gqk4H/kV/G3csdazLuyTMPsbFhzd1UabQbjFvDRmcWJxR3zcfHkVw9GfpbJmeev9F08WW8uDkaslwX6avlWGU6NRKz0g/SHtCy9J30o/ca9zX3Kfc19zn3BXQKRO8ud477hLnAfc1/G9mrzGlrfexZ5GLdn6ZZrrEohI2wVHhZywjbhUWEy8icMCGNCUdiBlq3r+xafL549HQ5jH+an+1y+LlYBifuxAvRN/lVVVOlwlCkdVm9NOL5BE4wkQ2SMlDZU97hX86EilU/lUmkQUztTE6mx1EEPh7OmdqBtAvv8HdWpbrJS6tJj3n0CWdM6busNzRV3S9KTYhqvNiqWmuroiKgYhshMjmhTh9ptWhsF7970j/SbMrsPE1suR5z7DMC+P/Hs+y7ijrQAlhyAgccjbhjPygfeBTjzhNqy28EdkUh8C+DU9+z2v/oyeH791OncxHOs5y2AtTc7nb/f73TWPkD/qwBnjX8BoJ98VQNcC+8AAAALSURBVAgdY2AAAgAABQABjbub8wAAAABJRU5ErkJggg=='''
         self.__lightGrayPixelData = '''iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAEGWlDQ1BrQ0dDb2xvclNwYWNlR2VuZXJpY1JHQgAAOI2NVV1oHFUUPrtzZyMkzlNsNIV0qD8NJQ2TVjShtLp/3d02bpZJNtoi6GT27s6Yyc44M7v9oU9FUHwx6psUxL+3gCAo9Q/bPrQvlQol2tQgKD60+INQ6Ium65k7M5lpurHeZe58853vnnvuuWfvBei5qliWkRQBFpquLRcy4nOHj4g9K5CEh6AXBqFXUR0rXalMAjZPC3e1W99Dwntf2dXd/p+tt0YdFSBxH2Kz5qgLiI8B8KdVy3YBevqRHz/qWh72Yui3MUDEL3q44WPXw3M+fo1pZuQs4tOIBVVTaoiXEI/MxfhGDPsxsNZfoE1q66ro5aJim3XdoLFw72H+n23BaIXzbcOnz5mfPoTvYVz7KzUl5+FRxEuqkp9G/Ajia219thzg25abkRE/BpDc3pqvphHvRFys2weqvp+krbWKIX7nhDbzLOItiM8358pTwdirqpPFnMF2xLc1WvLyOwTAibpbmvHHcvttU57y5+XqNZrLe3lE/Pq8eUj2fXKfOe3pfOjzhJYtB/yll5SDFcSDiH+hRkH25+L+sdxKEAMZahrlSX8ukqMOWy/jXW2m6M9LDBc31B9LFuv6gVKg/0Szi3KAr1kGq1GMjU/aLbnq6/lRxc4XfJ98hTargX++DbMJBSiYMIe9Ck1YAxFkKEAG3xbYaKmDDgYyFK0UGYpfoWYXG+fAPPI6tJnNwb7ClP7IyF+D+bjOtCpkhz6CFrIa/I6sFtNl8auFXGMTP34sNwI/JhkgEtmDz14ySfaRcTIBInmKPE32kxyyE2Tv+thKbEVePDfW/byMM1Kmm0XdObS7oGD/MypMXFPXrCwOtoYjyyn7BV29/MZfsVzpLDdRtuIZnbpXzvlf+ev8MvYr/Gqk4H/kV/G3csdazLuyTMPsbFhzd1UabQbjFvDRmcWJxR3zcfHkVw9GfpbJmeev9F08WW8uDkaslwX6avlWGU6NRKz0g/SHtCy9J30o/ca9zX3Kfc19zn3BXQKRO8ud477hLnAfc1/G9mrzGlrfexZ5GLdn6ZZrrEohI2wVHhZywjbhUWEy8icMCGNCUdiBlq3r+xafL549HQ5jH+an+1y+LlYBifuxAvRN/lVVVOlwlCkdVm9NOL5BE4wkQ2SMlDZU97hX86EilU/lUmkQUztTE6mx1EEPh7OmdqBtAvv8HdWpbrJS6tJj3n0CWdM6busNzRV3S9KTYhqvNiqWmuroiKgYhshMjmhTh9ptWhsF7970j/SbMrsPE1suR5z7DMC+P/Hs+y7ijrQAlhyAgccjbhjPygfeBTjzhNqy28EdkUh8C+DU9+z2v/oyeH791OncxHOs5y2AtTc7nb/f73TWPkD/qwBnjX8BoJ98VQNcC+8AAAAKSURBVAgdY3gGAADoAOegvBZqAAAAAElFTkSuQmCC'''
         self.__lightBluePixelData = '''iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAEGWlDQ1BrQ0dDb2xvclNwYWNlR2VuZXJpY1JHQgAAOI2NVV1oHFUUPrtzZyMkzlNsNIV0qD8NJQ2TVjShtLp/3d02bpZJNtoi6GT27s6Yyc44M7v9oU9FUHwx6psUxL+3gCAo9Q/bPrQvlQol2tQgKD60+INQ6Ium65k7M5lpurHeZe58853vnnvuuWfvBei5qliWkRQBFpquLRcy4nOHj4g9K5CEh6AXBqFXUR0rXalMAjZPC3e1W99Dwntf2dXd/p+tt0YdFSBxH2Kz5qgLiI8B8KdVy3YBevqRHz/qWh72Yui3MUDEL3q44WPXw3M+fo1pZuQs4tOIBVVTaoiXEI/MxfhGDPsxsNZfoE1q66ro5aJim3XdoLFw72H+n23BaIXzbcOnz5mfPoTvYVz7KzUl5+FRxEuqkp9G/Ajia219thzg25abkRE/BpDc3pqvphHvRFys2weqvp+krbWKIX7nhDbzLOItiM8358pTwdirqpPFnMF2xLc1WvLyOwTAibpbmvHHcvttU57y5+XqNZrLe3lE/Pq8eUj2fXKfOe3pfOjzhJYtB/yll5SDFcSDiH+hRkH25+L+sdxKEAMZahrlSX8ukqMOWy/jXW2m6M9LDBc31B9LFuv6gVKg/0Szi3KAr1kGq1GMjU/aLbnq6/lRxc4XfJ98hTargX++DbMJBSiYMIe9Ck1YAxFkKEAG3xbYaKmDDgYyFK0UGYpfoWYXG+fAPPI6tJnNwb7ClP7IyF+D+bjOtCpkhz6CFrIa/I6sFtNl8auFXGMTP34sNwI/JhkgEtmDz14ySfaRcTIBInmKPE32kxyyE2Tv+thKbEVePDfW/byMM1Kmm0XdObS7oGD/MypMXFPXrCwOtoYjyyn7BV29/MZfsVzpLDdRtuIZnbpXzvlf+ev8MvYr/Gqk4H/kV/G3csdazLuyTMPsbFhzd1UabQbjFvDRmcWJxR3zcfHkVw9GfpbJmeev9F08WW8uDkaslwX6avlWGU6NRKz0g/SHtCy9J30o/ca9zX3Kfc19zn3BXQKRO8ud477hLnAfc1/G9mrzGlrfexZ5GLdn6ZZrrEohI2wVHhZywjbhUWEy8icMCGNCUdiBlq3r+xafL549HQ5jH+an+1y+LlYBifuxAvRN/lVVVOlwlCkdVm9NOL5BE4wkQ2SMlDZU97hX86EilU/lUmkQUztTE6mx1EEPh7OmdqBtAvv8HdWpbrJS6tJj3n0CWdM6busNzRV3S9KTYhqvNiqWmuroiKgYhshMjmhTh9ptWhsF7970j/SbMrsPE1suR5z7DMC+P/Hs+y7ijrQAlhyAgccjbhjPygfeBTjzhNqy28EdkUh8C+DU9+z2v/oyeH791OncxHOs5y2AtTc7nb/f73TWPkD/qwBnjX8BoJ98VQNcC+8AAAAMSURBVAgdY5h08REABD4CRkzI4LsAAAAASUVORK5CYII='''
-
+        self.__blueGrayPixelData = '''iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAEGWlDQ1BrQ0dDb2xvclNwYWNlR2VuZXJpY1JHQgAAOI2NVV1oHFUUPrtzZyMkzlNsNIV0qD8NJQ2TVjShtLp/3d02bpZJNtoi6GT27s6Yyc44M7v9oU9FUHwx6psUxL+3gCAo9Q/bPrQvlQol2tQgKD60+INQ6Ium65k7M5lpurHeZe58853vnnvuuWfvBei5qliWkRQBFpquLRcy4nOHj4g9K5CEh6AXBqFXUR0rXalMAjZPC3e1W99Dwntf2dXd/p+tt0YdFSBxH2Kz5qgLiI8B8KdVy3YBevqRHz/qWh72Yui3MUDEL3q44WPXw3M+fo1pZuQs4tOIBVVTaoiXEI/MxfhGDPsxsNZfoE1q66ro5aJim3XdoLFw72H+n23BaIXzbcOnz5mfPoTvYVz7KzUl5+FRxEuqkp9G/Ajia219thzg25abkRE/BpDc3pqvphHvRFys2weqvp+krbWKIX7nhDbzLOItiM8358pTwdirqpPFnMF2xLc1WvLyOwTAibpbmvHHcvttU57y5+XqNZrLe3lE/Pq8eUj2fXKfOe3pfOjzhJYtB/yll5SDFcSDiH+hRkH25+L+sdxKEAMZahrlSX8ukqMOWy/jXW2m6M9LDBc31B9LFuv6gVKg/0Szi3KAr1kGq1GMjU/aLbnq6/lRxc4XfJ98hTargX++DbMJBSiYMIe9Ck1YAxFkKEAG3xbYaKmDDgYyFK0UGYpfoWYXG+fAPPI6tJnNwb7ClP7IyF+D+bjOtCpkhz6CFrIa/I6sFtNl8auFXGMTP34sNwI/JhkgEtmDz14ySfaRcTIBInmKPE32kxyyE2Tv+thKbEVePDfW/byMM1Kmm0XdObS7oGD/MypMXFPXrCwOtoYjyyn7BV29/MZfsVzpLDdRtuIZnbpXzvlf+ev8MvYr/Gqk4H/kV/G3csdazLuyTMPsbFhzd1UabQbjFvDRmcWJxR3zcfHkVw9GfpbJmeev9F08WW8uDkaslwX6avlWGU6NRKz0g/SHtCy9J30o/ca9zX3Kfc19zn3BXQKRO8ud477hLnAfc1/G9mrzGlrfexZ5GLdn6ZZrrEohI2wVHhZywjbhUWEy8icMCGNCUdiBlq3r+xafL549HQ5jH+an+1y+LlYBifuxAvRN/lVVVOlwlCkdVm9NOL5BE4wkQ2SMlDZU97hX86EilU/lUmkQUztTE6mx1EEPh7OmdqBtAvv8HdWpbrJS6tJj3n0CWdM6busNzRV3S9KTYhqvNiqWmuroiKgYhshMjmhTh9ptWhsF7970j/SbMrsPE1suR5z7DMC+P/Hs+y7ijrQAlhyAgccjbhjPygfeBTjzhNqy28EdkUh8C+DU9+z2v/oyeH791OncxHOs5y2AtTc7nb/f73TWPkD/qwBnjX8BoJ98VQNcC+8AAAAMSURBVAgdY3jx4j8ABYsC0GTwZRQAAAAASUVORK5CYII='''
         # ---------- Create the main window & set its minimum dimensions ----------
         self.mainWindow = Tk()
         self.mainWindow.minsize(self.MAIN_WND_MIN_WIDTH, self.MAIN_WND_MIN_HEIGHT)
         self.mainWindow.title('Spelman AutoGrader 2.X')
+
+        # ---------- Set the default fond for the app ----------
+        default_font = font.nametofont("TkDefaultFont")
+        default_font.configure(size=14, family="Arial")
+
+        # ---------- create pixel images ----------
+        self.__clearPixelImg = PhotoImage(data=self.__clearPixelData)
+        self.__lightGrayPixelImg = PhotoImage(file='pics/lightGrayPixel.png') #(data=self.__lightGrayPixelData)
+        self.__lightBluePixelImg = PhotoImage(data=self.__lightBluePixelData)
+        self.__blueGrayPixelImg = PhotoImage(data=self.__blueGrayPixelData)
+
+        # make images for the different buttons
+        self.imgBtn_150x30 = self.makeWidgetImage(150, 30)
+        self.imgBtn_76x30 = self.makeWidgetImage(76, 30)
+        self.imgBtn_100x50 = self.makeWidgetImage(100, 50)
+        self.imgBtn_100x30 = self.makeWidgetImage(100, 30)
+        self.imgBtn_85x30 = self.makeWidgetImage(100, 30)
+        self.imgBtn_150x30 = self.makeWidgetImage(150, 30)
+
+        self.imgBlueBtn_76x30 = self.makeWidgetImage(76, 30, self.WIDGET_CLR.LIGHT_BLUE)
 
         # ---------- create the main window frames ----------
         self.__frameMenu = Frame(self.mainWindow, bg='#e8e8ff', height=40, borderwidth=1, relief='groove')
         self.__frameMain = Frame(self.mainWindow, bg='#f0f0f0', borderwidth=1, relief='groove')
         self.__frameStatus = Frame(self.mainWindow,  bg='#e8e8ff', height=27, borderwidth=1, relief='groove')
 
-        # ---------- create button images ----------
-        self.__clearBtnImg = PhotoImage(data=self.__clearPixelData)
-        self.__lightGrayBtnImg = PhotoImage(data=self.__lightGrayPixelData)
-        self.__lightBlueBtnImg = PhotoImage(data=self.__lightBluePixelData)
-
         # ---------- create the main frames ----------
         self.__buildMenuFrame()
+        self.__buildMainFrames()
         self.__buildStatusFrame()
-
 
         # ---------- pack in the main window frames ----------
         self.__frameMenu.pack(fill=X, expand=False, side=TOP)
@@ -121,7 +299,12 @@ class Controller(IAGConstant):
         self.mainWindow.mainloop()
 
 
+    def __btnSettingClick(self):
+        #self.__settingsFrame.place(x=24, y=0)
+        self.__settingsFrame.lift()
 
+    def __btnInputClick(self):
+        self.__inputFrame.lift()
 
 # =======================================================================
 # public static void main(String[] args)
