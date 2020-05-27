@@ -82,7 +82,7 @@ class Controller(IAGConstant):
         self.btnInput = Button(self.__frameMenu, fg='black', text="1. Input/Setup", image=self.imgBtn_100x30, compound="center", command=self.__btnInputClick)
         self.btnInput.pack(side='left')
 
-        self.btnOutput = Button(self.__frameMenu, fg='black', text="2. Output", image=self.imgBtn_76x30, compound="center")
+        self.btnOutput = Button(self.__frameMenu, fg='black', text="2. Output", image=self.imgBtn_76x30, compound="center", command=self.__btnOutputClick)
         self.btnOutput.pack(side='left')
 
         self.btnConsole = Button(self.__frameMenu, fg='blue', text="Console", image=self.imgBlueBtn_76x30, compound="center")
@@ -94,12 +94,14 @@ class Controller(IAGConstant):
     # ======================================================================
     def __buildMainFrames(self):
         # build Settings frame
-        self.__buildSettingsFrame()
-        #self.__settingsFrame.place(x=24, y=0)
+        #TEMP self.__buildSettingsFrame()
 
         # build Input frame
-        self.__buildInputFrame()
+        #TEMP self.__buildInputFrame()
+
         # build Output frame
+        self.__buildOutputFrame()
+
         # build Console frame
         # build Help frame
 
@@ -237,12 +239,36 @@ class Controller(IAGConstant):
     # ======================================================================
     def __buildOutputFrame(self):
         self.__outputFrame = Frame(self.__frameMain, bg='#f0f0f0')
-        self.__outputFrame.pack(expand=True, fill='both') #place(x=0, y=0, width=400)
+        self.__outputFrame.pack(expand=True, fill=BOTH) #place(x=0, y=0, width=400)
+        #self.__outputFrame.place(x=0, y=0)
 
-        # make images for the different buttons
-        self.imgBtn_150x30 = self.makeWidgetImage(154, 30)
-        self.imgBtn_76x30 = self.makeWidgetImage(70, 30)
-        self.imgBtn_100x50 = self.makeWidgetImage(100, 50)
+        # ---------- create the main output window frames ----------
+        self.__outputFrameTop = Frame(self.__outputFrame, bg='#f0f0f0', height=30, borderwidth=0, relief=None)
+        self.__outputFrameMiddle = Frame(self.__outputFrame, bg='#f0f0f0', borderwidth=0, relief='groove')
+        self.__outputFrameBottom = Frame(self.__outputFrame,  bg='#f0f0f0', height=30, borderwidth=0, relief=None)
+
+        # Top Frame:  <<Prev / Student Name / Next >>
+        self.btnPrev = Button(self.__outputFrameTop, fg='black', text="<< Prev", image=self.imgBtn_100x30, compound="center", command=None)
+        self.btnPrev.pack(side=LEFT)
+
+        self.comboStudent = ttk.Combobox(self.__outputFrameTop, values=[], width=30)
+        self.comboStudent.pack(side=LEFT)
+
+        self.btnNext = Button(self.__outputFrameTop, fg='black', text="Next >>", image=self.imgBtn_100x30, compound="center", command=None)
+        self.btnNext.pack(side=LEFT)
+
+        # Middle Frame (Web View)
+
+        # Bottom Frame:  View Summary/View Report
+        self.btnSummaryReport = Button(self.__outputFrameBottom, fg='black', text="View Summary", image=self.imgBtn_150x30, compound="center", command=None)
+        self.btnSummaryReport.pack(side=LEFT)
+
+
+
+        # ---------- pack in the main window frames ----------
+        self.__outputFrameTop.pack(fill=None, expand=False, side=TOP)
+        self.__outputFrameMiddle.pack(fill=BOTH, expand=True, side=TOP)
+        self.__outputFrameBottom.pack(fill=None, expand=False, side=TOP)
 
     # =======================================================================
     #
@@ -276,7 +302,6 @@ class Controller(IAGConstant):
         self.imgBtn_100x50 = self.makeWidgetImage(100, 50)
         self.imgBtn_100x30 = self.makeWidgetImage(100, 30)
         self.imgBtn_85x30 = self.makeWidgetImage(100, 30)
-        self.imgBtn_150x30 = self.makeWidgetImage(150, 30)
 
         self.imgBlueBtn_76x30 = self.makeWidgetImage(76, 30, self.WIDGET_CLR.LIGHT_BLUE)
 
@@ -305,6 +330,9 @@ class Controller(IAGConstant):
 
     def __btnInputClick(self):
         self.__inputFrame.lift()
+
+    def __btnOutputClick(self):
+        self.__outputFrame.lift()
 
 # =======================================================================
 # public static void main(String[] args)
