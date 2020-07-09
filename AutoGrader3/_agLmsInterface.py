@@ -8,11 +8,11 @@ from console import console
 
 # function to retrieve assignments from the LMS
 # returns an assignment name, assignment ID and a list of assignments
-def getAssignmentsFromLms(self):
+def getAssignmentFromLms(self):
     return None
 
 # function to submit graded assignments back to the LMS
-def submitAssignmentsToLms(self, assignmentID, assignments):
+def submitAssignmentToLms(self, assignmentID, assignments):
     return
 
 # specify a place where the LMS can download and store assignment files

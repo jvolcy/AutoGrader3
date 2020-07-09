@@ -3,7 +3,7 @@
 # Interface of AG3 LMSes.
 # ======================================================================
 class IAssignmentStore(object):
-
+    pass
     # ---------- UI Constants ----------
 
 

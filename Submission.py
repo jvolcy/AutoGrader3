@@ -1,14 +1,14 @@
 
 # =======================================================================
-# Assignment
+# Submission
 # =======================================================================
-class Assignment(object):
+class Submission(object):
     def __init__(self):
         # ---------- general members ----------
         self.studentName = ''
-        self.assignmentDirectory = ''
-        self.assignmentFiles = []  # array of file objects
-        self.primaryAssignmentFile = None  # file object
+        self.submissionDirectory = ''
+        self.submissionFiles = []  # array of file objects
+        self.primarySubmissionFile = None  # file object
         self.language = ''
         # ---------- code analysis members ----------
         # self.linesOfCode = 0
@@ -28,7 +28,7 @@ class Assignment(object):
         self.instructorComment = ''
         # ---------- directives ----------
         self.nameDirective = ''        # student name
-        self.titleDirective = ''       # assignment title
+        self.titleDirective = ''       # submission title
         self.dateDirective = ''        # date
         self.mainDirective = ''        # main module
         self.dataDirective = ''        # misc. data

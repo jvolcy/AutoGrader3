@@ -21,7 +21,7 @@ class shellExecResult(object):
 
 # =======================================================================
 # structure to reports the status of the grading process,
-# processAssignments().  This function is expected to be run inside
+# processSubmissions().  This function is expected to be run inside
 # of a thread, service or task.  The status structure is used to "peek"
 # inside the running process.
 # ======================================================================
@@ -36,11 +36,11 @@ class ProcessingStatus(object):
 
 # =======================================================================
 # GradingEngine class
-# This class compiles and executes (or interprets) student assignments.
+# This class compiles and executes (or interprets) student submissions.
 # The central function of the class is processFiles().
 # At a minimum, the caller should specify the following prior to
 # calling processFiles:
-# - an ArrayList of Assignments
+# - an ArrayList of Submissions
 # - a cppCompiler or python3Interpreter, as appropriate
 # - testDataFiles, if required
 # ======================================================================
@@ -51,8 +51,8 @@ class GradingEngine(IAGConstant):
     # GradingEngine Constructor
     # ======================================================================
     def __init__(self):
-        # The assignments list.
-        self.assignments = []
+        # The submissions list.
+        self.submissions = []
         self.testDataFiles = []
         #private String outputFileName;
         self.__tempOutputDirectory = None
@@ -453,21 +453,21 @@ class GradingEngine(IAGConstant):
         return execResult
 
     # =======================================================================
-    # private void pythonSubProcess(Assignment assignment, int numTests, boolean bNoTestFiles)
+    # private void pythonSubProcess(Submission submission, int numTests, boolean bNoTestFiles)
     # The functions pythonSubProcess() and cppSubProcess() exist simply
-    # to reduce the size of the execAssignment() function.  Much of the
+    # to reduce the size of the execSubmission() function.  Much of the
     # pre- and post-processing leading up to and following the calls to
     # these functions is common.  To the extent possible, that commonality
-    # is captured in execAssignment().
+    # is captured in execSubmission().
     # ======================================================================
-    def __pythonSubProcess(self, assignment, numTests, bNoTestFiles):
+    def __pythonSubProcess(self, submission, numTests, bNoTestFiles):
 
-        # For python, there should be a primary assignment file;  for C++, it doesn't matter
-        if assignment.primaryAssignmentFile is None:
+        # For python, there should be a primary submission file;  for C++, it doesn't matter
+        if submission.primarySubmissionFile is None:
             return
 
-        #sourceFile = os.path.abspath(assignment.primaryAssignmentFile)
-        sourceFile = assignment.primaryAssignmentFile
+        #sourceFile = os.path.abspath(submission.primarySubmissionFile)
+        sourceFile = submission.primarySubmissionFile
 
         # we have to add logic that handles the case where no test files are required differently
         # from the cases where test files are needed.  In the former case, there is no input
@@ -489,42 +489,42 @@ class GradingEngine(IAGConstant):
                         "\"" + sourceFile + "\"" + " < \"" + dataFileName + "\""
 
             # the command string, cmd
-            execResult = self.__shellExec(cmd, self.__maxRunTime, self.__maxOutputLines, sourceFile, assignment.assignmentDirectory)
+            execResult = self.__shellExec(cmd, self.__maxRunTime, self.__maxOutputLines, sourceFile, submission.submissionDirectory)
 
-            # store the output in the assignment object
-            assignment.progOutputs[i] = execResult.output
+            # store the output in the submission object
+            submission.progOutputs[i] = execResult.output
 
-            # store any runtime/compiler errors in the assignment object
-            assignment.runtimeErrors[i] = ""   #initialize the runtimeErrors string
+            # store any runtime/compiler errors in the submission object
+            submission.runtimeErrors[i] = ""   #initialize the runtimeErrors string
             if execResult.bTimedOut:
-                assignment.runtimeErrors[i] += "Maximum execution time of " + str(self.__maxRunTime) \
+                submission.runtimeErrors[i] += "Maximum execution time of " + str(self.__maxRunTime) \
                         + " seconds exceeded.  Process forcefully terminated... output may be lost.\n"
 
             if execResult.bMaxLinesExceeded:
-                assignment.runtimeErrors[i] += "Maximum lines of output (" + str(self.__maxOutputLines) \
+                submission.runtimeErrors[i] += "Maximum lines of output (" + str(self.__maxOutputLines) \
                         + ") exceeded.  Output truncated.\n"
 
 
-            # store the execution time in the assignment object
-            assignment.executionTimes[i] = execResult.execTimeSec
+            # store the execution time in the submission object
+            submission.executionTimes[i] = execResult.execTimeSec
 
 
     # =======================================================================
-    # private void cppSubProcess(Assignment assignment, int numTests, boolean bNoTestFiles)
+    # private void cppSubProcess(Submission submission, int numTests, boolean bNoTestFiles)
     # The functions pythonSubProcess() and cppSubProcess() exist simply
-    # to reduce the size of the execAssignment() function.  Much of the
+    # to reduce the size of the execSubmission() function.  Much of the
     # pre- and post-processing leading up to and following the calls to
     # these functions is common.  To the extent possible, that commonality
-    # is captured in execAssignment().
+    # is captured in execSubmission().
     # ======================================================================
-    def __cppSubProcess(self, assignment, numTests, bNoTestFiles):
-        console("cppSubProcess: " + assignment.studentName)
+    def __cppSubProcess(self, submission, numTests, bNoTestFiles):
+        console("cppSubProcess: " + submission.studentName)
 
-        exeFile = assignment.assignmentDirectory + "/AG.out"
+        exeFile = submission.submissionDirectory + "/AG.out"
 
         # Compile the source once.
-        execResult = self.__compileCppFiles(self.__cppCompiler, assignment.assignmentFiles, exeFile, self.__MAX_COMPILE_TIME_SEC, self.__MAX_COMPILER_OUTPUT_LINES)
-        assignment.compilerErrors = execResult.output
+        execResult = self.__compileCppFiles(self.__cppCompiler, submission.submissionFiles, exeFile, self.__MAX_COMPILE_TIME_SEC, self.__MAX_COMPILER_OUTPUT_LINES)
+        submission.compilerErrors = execResult.output
 
         if exeFile.isFile():   #did the compilation succeed?
             console("Compilation succeeded.")
@@ -551,39 +551,39 @@ class GradingEngine(IAGConstant):
 
 
             # the command string, cmd
-            execResult = self.__shellExec(cmd, self.__maxRunTime, self.__maxOutputLines, os.path.abspath(exeFile), assignment.assignmentDirectory)
+            execResult = self.__shellExec(cmd, self.__maxRunTime, self.__maxOutputLines, os.path.abspath(exeFile), submission.submissionDirectory)
 
-            # store the output in the assignment object
-            assignment.progOutputs[i] = execResult.output
+            # store the output in the submission object
+            submission.progOutputs[i] = execResult.output
 
-            # store any runtime/compiler errors in the assignment object
-            assignment.runtimeErrors[i] = ""   #initialize the runtimeErrors string
+            # store any runtime/compiler errors in the submission object
+            submission.runtimeErrors[i] = ""   #initialize the runtimeErrors string
             if execResult.bTimedOut:
-                assignment.runtimeErrors[i] += "Maximum execution time of " + str(self.__maxRunTime) \
+                submission.runtimeErrors[i] += "Maximum execution time of " + str(self.__maxRunTime) \
                         + " seconds exceeded.  Process forcefully terminated... output may be lost.\n"
             if execResult.bMaxLinesExceeded:
-                assignment.runtimeErrors[i] += "Maximum lines of output (" + str(self.__maxOutputLines) \
+                submission.runtimeErrors[i] += "Maximum lines of output (" + str(self.__maxOutputLines) \
                         + ") exceeded.  Output truncated.\n";
 
 
-            # store the execution time in the assignment object
-            assignment.executionTimes[i] = execResult.execTimeSec;
+            # store the execution time in the submission object
+            submission.executionTimes[i] = execResult.execTimeSec;
 
 
 
 
     # =======================================================================
-    # private void execAssignment(Assignment assignment)
+    # private void execSubmission(Submission submission)
     #
     # ======================================================================
-    def execAssignment(self, assignment):
+    def execSubmission(self, submission):
         # numTests = the number of test cases.  This is either 1 if there
         # are no test files, or equal to the # of test files.
         # int numTests;
         # boolean bNoTestFiles;       #set a flag to denote no test files
 
         if self.testDataFiles is None:
-            #assignment.testFiles is null.  Assume there are no test
+            #submission.testFiles is null.  Assume there are no test
             #files.  Set numTests to 1.
             numTests = 1
             bNoTestFiles = True
@@ -603,41 +603,41 @@ class GradingEngine(IAGConstant):
 
         console("bNoTestFilesc = " + str(bNoTestFiles))
         # create arrays to hold test results
-        assignment.runtimeErrors = [''] * numTests
-        assignment.progOutputs = [''] * numTests
-        assignment.executionTimes = [0.0] * numTests
+        submission.runtimeErrors = [''] * numTests
+        submission.progOutputs = [''] * numTests
+        submission.executionTimes = [0.0] * numTests
 
-        if assignment.language == IAGConstant.LANGUAGE_PYTHON3:
+        if submission.language == IAGConstant.LANGUAGE_PYTHON3:
             if self.__python3Interpreter is None or self.__python3Interpreter == "":
-                assignment.compilerErrors = "No Python interpreter found."
-            elif assignment.primaryAssignmentFile is None or assignment.primaryAssignmentFile == "":
-                assignment.compilerErrors = "Submission not graded."
+                submission.compilerErrors = "No Python interpreter found."
+            elif submission.primarySubmissionFile is None or submission.primarySubmissionFile == "":
+                submission.compilerErrors = "Submission not graded."
             else:
-                self.__pythonSubProcess(assignment, numTests, bNoTestFiles)
-        elif assignment.language == IAGConstant.LANGUAGE_CPP:
+                self.__pythonSubProcess(submission, numTests, bNoTestFiles)
+        elif submission.language == IAGConstant.LANGUAGE_CPP:
             if self.__cppCompiler is None or self.__cppCompiler == "":
-                assignment.compilerErrors = "No C++ compiler found."
+                submission.compilerErrors = "No C++ compiler found."
             else:
-                self.__cppSubProcess(assignment, numTests, bNoTestFiles)
+                self.__cppSubProcess(submission, numTests, bNoTestFiles)
 
-        # tag the assignment as "auto-graded"
-        assignment.bAutoGraded = True
+        # tag the submission as "auto-graded"
+        submission.bAutoGraded = True
 
 
     # =======================================================================
-    # public void processAssignments()
+    # public void processSubmissions()
     #
     # processFiles is the central function of the GradingEngine class.
     # This function performs the auto-grading.
     # At a minimum, the caller should specify the following prior to
     # calling processFiles():
-    # - an ArrayList of Assignments
+    # - an ArrayList of Submissions
     # - a cppCompiler or python3Interpreter, as appropriate
     # - testDataFiles, if required
     # ======================================================================
-    def processAssignments(self):
+    def processSubmissions(self):
         self.bAbortRequest = False
-        self.processingStatus = ProcessingStatus(True, "", 1, 1, len(self.assignments))
+        self.processingStatus = ProcessingStatus(True, "", 1, 1, len(self.submissions))
 
         #---------- start the grading service ----------
         self.__gradingServiceThread = threading.Thread(target=gradingServiceThread, args=(self,))
@@ -647,45 +647,45 @@ class GradingEngine(IAGConstant):
 
 
     # =======================================================================
-    # public void dumpAssignments()
-    # dumpAssignments is a  debugging function that dumps the contents
-    # of the Assignments array list to the screen.
+    # public void dumpSubmissions()
+    # dumpSubmissions is a  debugging function that dumps the contents
+    # of the Submissions array list to the screen.
     # ======================================================================
-    def dumpAssignments(self):
-        console("[" + str(len(self.assignments)) + "] assignment(s) found.")
+    def dumpSubmissions(self):
+        console("[" + str(len(self.submissions)) + "] submission(s) found.")
 
-        for assignment in self.assignments:
+        for submission in self.submissions:
             console("------------------------------------------")
-            console("studentName = " + assignment.studentName)
-            console("assignmentDirectory = " + assignment.assignmentDirectory)
-            console("language = " + assignment.language)
+            console("studentName = " + submission.studentName)
+            console("submissionDirectory = " + submission.submissionDirectory)
+            console("language = " + submission.language)
 
-            console(str(len(assignment.assignmentFiles)) + " assignmentFiles:")
-            for f in assignment.assignmentFiles:
+            console(str(len(submission.submissionFiles)) + " submissionFiles:")
+            for f in submission.submissionFiles:
                 console("\t" + f)
 
-            console("primaryAssignmentFile = " + str(assignment.primaryAssignmentFile))
+            console("primarySubmissionFile = " + str(submission.primarySubmissionFile))
 
             print(self.testDataFiles)
 
-            if assignment.assignmentFiles is not None:           # TEMP*******
-                if len(assignment.assignmentFiles) == 0:
+            if submission.submissionFiles is not None:           # TEMP*******
+                if len(submission.submissionFiles) == 0:
                     console("No programming files found.")
                 else:
                     for i in range (len(self.testDataFiles)):
                         console("---> Results for test file %s: ", self.testDataFiles[i])
-                        if assignment.runtimeErrors is not None:
-                            console("Compiler/Limit Errors: %s", assignment.runtimeErrors[i])
+                        if submission.runtimeErrors is not None:
+                            console("Compiler/Limit Errors: %s", submission.runtimeErrors[i])
 
-                        if assignment.progOutputs is not None:
-                            console("Output: %s", assignment.progOutputs[i])
+                        if submission.progOutputs is not None:
+                            console("Output: %s", submission.progOutputs[i])
 
-                        if assignment.executionTimes is not None:
-                            console("Execution Time: %s sec.", assignment.executionTimes[i])
+                        if submission.executionTimes is not None:
+                            console("Execution Time: %s sec.", submission.executionTimes[i])
 
-            console("bAutograded = %s", assignment.bAutoGraded)
-            console("grade = %d", assignment.grade)
-            console("instructorComment = " + assignment.instructorComment)
+            console("bAutograded = %s", submission.bAutoGraded)
+            console("grade = %d", submission.grade)
+            console("instructorComment = " + submission.instructorComment)
 
 
     # =======================================================================
@@ -705,19 +705,19 @@ def gradingServiceThread(gradingEngine):
 
     console("gradingServiceThread() running...")
 
-    #gradingEngine.dumpAssignments()
+    #gradingEngine.dumpSubmissions()
 
-    for assignment in gradingEngine.assignments:
-        console("Processing " + assignment.studentName)
-        gradingEngine.processingStatus.message = assignment.studentName
-        gradingEngine.execAssignment(assignment)
+    for submission in gradingEngine.submissions:
+        console("Processing " + submission.studentName)
+        gradingEngine.processingStatus.message = submission.studentName
+        gradingEngine.execSubmission(submission)
         gradingEngine.processingStatus.progress += 1
 
         #if a request is made to stop processing, break out of the loop
         if gradingEngine.bAbortRequest:
             break
 
-    gradingEngine.dumpAssignments()
+    gradingEngine.dumpSubmissions()
 
     #indicate that the thread is done.
     gradingEngine.processingStatus.bRunning = False

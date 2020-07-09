@@ -19,7 +19,7 @@ from AGDocument import AGDocument
 # 	GradingEngine
 # 	MossClient
 # 	ReportGenerator
-# 	IAssignmentStore (implements: assignmentName, assignmentDirectory, [[assignmentFiles], studentName, studentID, submitGrade(grade, msg)], setWorkingDirectory() )
+# 	ISubmissionStore (implements: submissionName, submissionDirectory, [[submissionFiles], studentName, studentID, submitGrade(grade, msg)], setWorkingDirectory() )
 #
 # AutoGrader3 files structure -> what objects/functions the file manages
 # 	_agConfig.py -> misc configurations
@@ -51,17 +51,17 @@ class AutoGrader3(IAGConstant):
     # Grading Engine module functions
     from ._agGrader import _setAssignmentName
     from ._agGrader import _cleanupDataFiles
-    from ._agGrader import _discoverPrimaryAssignmentFile
+    from ._agGrader import _discoverPrimarySubmissionFile
     from ._agGrader import _prepareDataFiles
-    from ._agGrader import addAssignment
+    from ._agGrader import addSubmission
     from ._agGrader import addDataFile
     from ._agGrader import addTestDataFile
     from ._agGrader import breakOutTestFiles
     from ._agGrader import grade
 
     # LMS interface functions
-    from ._agLmsInterface import getAssignmentsFromLms
-    from ._agLmsInterface import submitAssignmentsToLms
+    from ._agLmsInterface import getAssignmentFromLms
+    from ._agLmsInterface import submitAssignmentToLms
     from ._agLmsInterface import setWorkingDirectory
 
 

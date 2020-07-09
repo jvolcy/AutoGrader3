@@ -1,7 +1,7 @@
 from IAGConstant import IAGConstant
 from console import console
 from AutoGrader3 import AutoGrader3
-from Assignment import Assignment
+from Submission import Submission
 from pathlib import Path
 
 autoGrader =  None
@@ -23,7 +23,7 @@ def main():
     autoGrader = AutoGrader3()
 
 
-    # 1 set the name of the assignment here
+    # 1 set the name of the submission here
     autoGrader._setAssignmentName("P1005 Test Assignment")
 
     # 2 set the list of test data and data files here
@@ -32,40 +32,40 @@ def main():
     autoGrader.addDataFile('/Users/jvolcy/Documents/words.txt')
 
 
-    # 3 Add assignments to the AGDocument's grading engine here
+    # 3 Add submissions to the AGDocument's grading engine here
 
     # -----------------------------------------------------------
     # TEST ASSIGNMENT #1
-    assignment = Assignment()
-    assignment.assignmentDirectory = "/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005/Abiodun Scott"
-    assignment.assignmentFiles.append("P1005.py")
-    assignment.language = 'Python 3'
-    assignment.studentName = 'Abiodun Scott'
+    submission = Submission()
+    submission.submissionDirectory = "/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005/Abiodun Scott"
+    submission.submissionFiles.append("P1005.py")
+    submission.language = 'Python 3'
+    submission.studentName = 'Abiodun Scott'
 
-    # add assignments
-    autoGrader.addAssignment(assignment)
+    # add submissions
+    autoGrader.addSubmission(submission)
 
     # -----------------------------------------------------------
     # TEST ASSIGNMENT #2
-    assignment = Assignment()
-    assignment.assignmentDirectory = "/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005/Adia Haynes"
-    assignment.assignmentFiles.append("P1005.py")
-    assignment.language = 'Python 3'
-    assignment.studentName = 'Adia Haynes'
+    submission = Submission()
+    submission.submissionDirectory = "/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005/Adia Haynes"
+    submission.submissionFiles.append("P1005.py")
+    submission.language = 'Python 3'
+    submission.studentName = 'Adia Haynes'
 
-    # add assignments
-    autoGrader.addAssignment(assignment)
+    # add submissions
+    autoGrader.addSubmission(submission)
 
     # -----------------------------------------------------------
     # TEST ASSIGNMENT #3
-    assignment = Assignment()
-    assignment.assignmentDirectory = "/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005/Amore Daniels"
-    assignment.assignmentFiles.append("P1005 - Spellchecker.py")
-    assignment.language = 'Python 3'
-    assignment.studentName = 'Amore Daniels'
+    submission = Submission()
+    submission.submissionDirectory = "/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005/Amore Daniels"
+    submission.submissionFiles.append("P1005 - Spellchecker.py")
+    submission.language = 'Python 3'
+    submission.studentName = 'Amore Daniels'
 
-    # add assignments
-    autoGrader.addAssignment(assignment)
+    # add submissions
+    autoGrader.addSubmission(submission)
 
     # -----------------------------------------------------------
 
@@ -113,13 +113,13 @@ HELP_HTML = "<!DOCTYPE html PUBLIC \"-#W3C#DTD XHTML 1.0 Strict#EN\" \"http:#www
     "The Spelman AutoGrader 2 program is designed to help grade " + \
     "Python and C++ programs submitted through Moodle.&nbsp; The program runs on macOS and Linux systems only.  " + \
     "It is not Windows compatible.  To use the program, " + \
-    "perform a “download all submissions” of the target assignment from " + \
+    "perform a “download all submissions” of the target submission from " + \
     "Moodle. &nbsp;Extract " + \
     "the downloaded zip file.&nbsp; This will create a directory on disk that holds " + \
     "all student submissions.&nbsp; We will call this our “top-level " + \
     "directory” (TLD).&nbsp; The TLD should contain as many sub-directories as there " + \
-    "are submitted assignments.&nbsp; The names of these sub-directories should be " + \
-    "formatted as “student name_assignment”.&nbsp; If your TLD does not contain " + \
+    "are submitted submissions.&nbsp; The names of these sub-directories should be " + \
+    "formatted as “student name_submission”.&nbsp; If your TLD does not contain " + \
     "sub-directories, please see the section on&nbsp; " + \
     "<a href=\"#moodle_download_settings\">Moodle Download Settings</a>.<br>&nbsp;<br>" + \
     "The individual student directories may contain program files " + \
@@ -165,7 +165,7 @@ HELP_HTML = "<!DOCTYPE html PUBLIC \"-#W3C#DTD XHTML 1.0 Strict#EN\" \"http:#www
     "you may let the AutoGrader automatically detect the language by " + \
     "selecting “Auto”.&nbsp; This&nbsp; is the recommended setting.&nbsp; In " + \
     "“Auto” mode, it is possible to have mixed-language submissions, meaning " + \
-    "that some students may submit their assignment in Python while others " + \
+    "that some students may submit their submission in Python while others " + \
     "do so in C++.</li></ul>" + \
     "<ul><li><span style=\"font-weight: bold;\">Max Run Time </span>- You may specify the maximum run-time for each " + \
     "submission.&nbsp; This is a safeguard against rogue programs that run " + \
@@ -288,7 +288,7 @@ HELP_HTML = "<!DOCTYPE html PUBLIC \"-#W3C#DTD XHTML 1.0 Strict#EN\" \"http:#www
     "</big><br>If the downloaded student submissions are not in individual " + \
     "folders under the top-level directory, follow the instructions below " + \
     "<br><ol><li>Verify that you are using Moodle 3.1 or later</li>" + \
-    "<li>Go to the assignment and click on “View/grade all submissions”</li>" + \
+    "<li>Go to the submission and click on “View/grade all submissions”</li>" + \
     "<li>Scroll to the very bottom of the page and verify that the “Download " + \
     "submissions in folders” option is checked.&nbsp; You will only need to do " + \
     "this once.&nbsp;" + \

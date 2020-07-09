@@ -5,8 +5,8 @@ from shutil import copy
 # =======================================================================
 # 
 # =======================================================================
-def _setAssignmentName(self, assignmentName):
-    self._agDocument.assignmentName = assignmentName
+def _setAssignmentName(self, submissionName):
+    self._agDocument.assignmentName = submissionName
 
 def addTestDataFile(self, testDataFile):
     self._agDocument.gradingEngine.testDataFiles.append(testDataFile)
@@ -14,8 +14,8 @@ def addTestDataFile(self, testDataFile):
 def addDataFile(self, dataFile):
     self._agDocument.dataFiles.append(dataFile)
 
-def addAssignment(self, assignment):
-    self._agDocument.gradingEngine.assignments.append(assignment)
+def addSubmission(self, submission):
+    self._agDocument.gradingEngine.submissions.append(submission)
 
 # =======================================================================
 # prepareDataFiles()
@@ -26,9 +26,9 @@ def _prepareDataFiles(self):
     #---------- copy all data files into each submission directory ----------
     #go through every data file in the listDataFiles list box
     for src in  self._agDocument.dataFiles:
-        # copy each data file to each of the assignment directories
-        for assignment in self._agDocument.gradingEngine.assignments:
-            dst = assignment.assignmentDirectory + "/" + os.path.basename(src)
+        # copy each data file to each of the submission directories
+        for submission in self._agDocument.gradingEngine.submissions:
+            dst = submission.submissionDirectory + "/" + os.path.basename(src)
             try:
                 console("copying \"" + src + "\" to \"" + dst + "\"")
                 copy(src, dst)
@@ -44,9 +44,9 @@ def _prepareDataFiles(self):
 # =======================================================================
 def _cleanupDataFiles(self):
     for src in  self._agDocument.dataFiles:
-        # delete the data files from each of the assignment directories
-        for assignment in self._agDocument.gradingEngine.assignments:
-            dst = assignment.assignmentDirectory + "/" + os.path.basename(src)
+        # delete the data files from each of the submission directories
+        for submission in self._agDocument.gradingEngine.submissions:
+            dst = submission.submissionDirectory + "/" + os.path.basename(src)
             try:
                 console('removing "' + dst + '"')
                 os.remove(dst)
@@ -99,25 +99,25 @@ return testFiles;
 '''
 
 # =======================================================================
-# _discoverPrimaryAssignmentFile()
+# _discoverPrimarySubmissionFile()
 # function that attempts to automatically detect the primary programming
 # file for python.  This works only if the user hasn't specified a
 # primary file or when there is only 1 python file.  If more than
 # one python source file exists, the user MUST specify a primary.
 # for python programs, we must idenfity the primary code file if
-# multiple files are present.  If only one assignment file is given,
+# multiple files are present.  If only one submission file is given,
 # set it as the primary.
 # =======================================================================
-def _discoverPrimaryAssignmentFile(self, assignment):
-    #if the user has already specified a primary assignment file, do nothing
-    if assignment.primaryAssignmentFile is not None:
+def _discoverPrimarySubmissionFile(self, submission):
+    #if the user has already specified a primary submission file, do nothing
+    if submission.primarySubmissionFile is not None:
         return
 
-    #if we only have 1 assignmentFile, make it the primary
-    if len(assignment.assignmentFiles) == 1:
-        assignment.primaryAssignmentFile = assignment.assignmentFiles[0]
+    #if we only have 1 submissionFile, make it the primary
+    if len(submission.submissionFiles) == 1:
+        submission.primarySubmissionFile = submission.submissionFiles[0]
 
-    #return without setting the value of the primaryAssignmentFile (at this point, it should be None)
+    #return without setting the value of the primarySubmissionFile (at this point, it should be None)
     #This does not matter for C++.
     return
 
@@ -142,14 +142,14 @@ def grade(self):
     self.breakOutTestFiles("")
 
 
-    #attempt to discover the primary assignment file for each submission
-    for assignment in self._agDocument.gradingEngine.assignments:
-        self._discoverPrimaryAssignmentFile(assignment)
+    #attempt to discover the primary submission file for each submission
+    for submission in self._agDocument.gradingEngine.submissions:
+        self._discoverPrimarySubmissionFile(submission)
 
 
     # perform grading
-    console("Processing assignments...")
-    self._agDocument.gradingEngine.processAssignments()
+    console("Processing submissions...")
+    self._agDocument.gradingEngine.processSubmissions()
 
     # grading happens is a separate thread.  We can monitor the state of that thread through the status
     # variable returned by gradingEngine.getProcessingStatus()

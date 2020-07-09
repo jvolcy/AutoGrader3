@@ -10,7 +10,7 @@ from CodeAnalyzer import CodeAnalyzer
 
 # =======================================================================
 # ReportGenerator
-# Class to generate syntax-highlighted html report of graded Assignments.
+# Class to generate syntax-highlighted html report of graded Submissions.
 # An important component of the class is the source code syntax
 # highlighter:
 #
@@ -40,10 +40,10 @@ class ReportGenerator(IAGConstant):
     HTML_COMMENT_ID_SUFFIX = " comment"
 
     # =======================================================================
-    # ReportGenerator(String title, String headerText, ArrayList<Assignment> assignments, ArrayList<File> testDataFiles)
+    # ReportGenerator(String title, String headerText, ArrayList<Submission> submissions, ArrayList<File> testDataFiles)
     # ReportGenerator constructor.
     # ======================================================================
-    def __init__(self, title,  headerText, assignments, testDataFiles):
+    def __init__(self, title,  headerText, submissions, testDataFiles):
 
         # ---------- misc constants ----------
         # self.__PROG_OUTPUT_START_TOKEN = "@@@_START_TOKEN_@@@"
@@ -61,7 +61,7 @@ class ReportGenerator(IAGConstant):
         self.__FEEDBACK_COLOR = "purple"   # color of "instructor feedback" text
         self.__LINE_NUMBER_COLOR = "gray"  # color for code line numbers
 
-        self.__assignments = assignments  # list of Assignment objects
+        self.__submissions = submissions  # list of Submission objects
         self.__testDataFiles = testDataFiles  # list of file objects
         self.__title = title
         self.__headerText = headerText
@@ -76,13 +76,13 @@ class ReportGenerator(IAGConstant):
     def generateReport(self):
         self.__makeHtmlHeader()
 
-        for assignment in self.__assignments:
-            self.__reportFileAnalytics(assignment)
-            self.__reportSourceCode(assignment)
-            self.__reportOutputs(assignment)
-            self.__insertGradingBoxes(assignment)
+        for submission in self.__submissions:
+            self.__reportFileAnalytics(submission)
+            self.__reportSourceCode(submission)
+            self.__reportOutputs(submission)
+            self.__insertGradingBoxes(submission)
 
-        self.__reportClosingInfo(self.__assignments)
+        self.__reportClosingInfo(self.__submissions)
         self.__closeHtmlHeader()
 
 
@@ -100,17 +100,17 @@ class ReportGenerator(IAGConstant):
                 "<body style=\"background: white; font-family: Helvetica\">",
                 "<h2> Grading Summary<br><font color=\"gray\">" + self.__fileNameFromPathName(self.__headerText) + "</h2>"])
 
-        for assignment in self.__assignments:
-            grade = "---" if assignment.grade is None else assignment.grade.toString()
+        for submission in self.__submissions:
+            grade = "---" if submission.grade is None else submission.grade.toString()
 
             # for v 2.0.4, we replace the \n with <br> so that the instructor comment is properly formatted on the summary view.
-            instructorComment = "None" if (assignment.instructorComment is None or assignment.instructorComment == '') \
-                    else assignment.instructorComment.replace("\n", "<br>")
+            instructorComment = "None" if (submission.instructorComment is None or submission.instructorComment == '') \
+                    else submission.instructorComment.replace("\n", "<br>")
 
-            self.__summary += "<a id=\"" + assignment.studentName + "\"></a>\n"
+            self.__summary += "<a id=\"" + submission.studentName + "\"></a>\n"
             # self.__summary += "<hr width=\"100%\" align=\"left\">"
             self.__summary += "<hr><font face=\"verdana\" color=\"black\">"
-            self.__summary += "<b>" + assignment.studentName + "</b><br>Grade<br>"
+            self.__summary += "<b>" + submission.studentName + "</b><br>Grade<br>"
             self.__summary += "<font face=\"verdana\" color=\"blue\">"
             self.__summary += grade + "<br>"
             self.__summary += "<font face=\"verdana\" color=\"black\">Instructor comments<br>"
@@ -124,30 +124,30 @@ class ReportGenerator(IAGConstant):
     # public static String generateAnnotatedReport(AGDocument agDocument)
     # Given an AGDocument object, this function annotates the object's
     # HTML report with the grade and instructor comments from the
-    # object's Assignment member.  The function returns an annotated HTML
+    # object's Submission member.  The function returns an annotated HTML
     # report suitable for saving to an HTML file.
     # ======================================================================
     @classmethod
     def generateAnnotatedReport(cls, agDocument):
         htmlReport = agDocument.htmlReport
 
-        for assignment in agDocument.gradingEngine.assignments:
-            gradeID = assignment.studentName + cls.HTML_GRADE_ID_SUFFIX
-            commentID = assignment.studentName + cls.HTML_COMMENT_ID_SUFFIX
+        for submission in agDocument.gradingEngine.submissions:
+            gradeID = submission.studentName + cls.HTML_GRADE_ID_SUFFIX
+            commentID = submission.studentName + cls.HTML_COMMENT_ID_SUFFIX
 
             # For the grade, the entry is part of the the "value=" statement.
             # The insertion point is right before the closing ">" of the
             # "input" HTML tag.
             gradeLoc = htmlReport.indexOf(gradeID)
             gradeLoc = htmlReport.indexOf(">", gradeLoc)
-            htmlReport = htmlReport.substring(0, gradeLoc) + assignment.grade + htmlReport.substring(gradeLoc)
+            htmlReport = htmlReport.substring(0, gradeLoc) + submission.grade + htmlReport.substring(gradeLoc)
 
             # For the comment, the entry is part of a textarea.
             # The insertion point is right after the closing ">" of the
             # "textarea" HTML tag.  We add 1 to the location of the commentID.
             commentLoc = htmlReport.indexOf(commentID)
             commentLoc = htmlReport.indexOf(">", commentLoc)
-            htmlReport = htmlReport.substring(0, commentLoc+1) + assignment.instructorComment + htmlReport.substring(commentLoc+1)
+            htmlReport = htmlReport.substring(0, commentLoc+1) + submission.instructorComment + htmlReport.substring(commentLoc+1)
 
         return htmlReport
 
@@ -247,48 +247,48 @@ class ReportGenerator(IAGConstant):
 
 
     # =======================================================================
-    # private void reportFileAnalytics(Assignment assignment)
-    # function that reports analytics for every file in a given assignment
+    # private void reportFileAnalytics(Submission submission)
+    # function that reports analytics for every file in a given submission
     # ======================================================================
-    def __reportFileAnalytics(self, assignment):
+    def __reportFileAnalytics(self, submission):
         report = ""
 
         report += "<font face=\"verdana\" color=\"" + self.__HEADER_COLOR1 + "\">"
-        report += "<a id=\"" + assignment.studentName + "\"></a>\n"
+        report += "<a id=\"" + submission.studentName + "\"></a>\n"
         report += "<br>\n=======================================================<br>\n"
-        report += assignment.studentName + "<br>\n"
+        report += submission.studentName + "<br>\n"
 
         # we have 3 cases to consider here:
-        # 1) there are no assignments files.  In this case, we simply want to state
-        # that no assignment files were found
-        # 2) there is 1 assignment file.  In this case, we want to output the name
-        # of the assignment file in the report
-        # 3) there are multiple assignment files.  In this case, we want to include
+        # 1) there are no submissions files.  In this case, we simply want to state
+        # that no submission files were found
+        # 2) there is 1 submission file.  In this case, we want to output the name
+        # of the submission file in the report
+        # 3) there are multiple submission files.  In this case, we want to include
         # the the name of the parent directory in bold.
-        if assignment.assignmentFiles.size() == 0:
+        if submission.submissionFiles.size() == 0:
             # report += "No programming files found.";
             report += self.__formatErrorMsg("No programming files found.")
-        elif assignment.assignmentFiles.size() == 1:
+        elif submission.submissionFiles.size() == 1:
             # if this is a single file, simply output its name
-            report += assignment.assignmentFiles.get(0).getName()
+            report += submission.submissionFiles.get(0).getName()
         else:
             # here, these are multiple files: list the directory name in bold
-            report += "<b>" + self.__fileNameFromPathName(assignment.assignmentDirectory) + "</b>" # directory name in bold
+            report += "<b>" + self.__fileNameFromPathName(submission.submissionDirectory) + "</b>" # directory name in bold
 
         report += "<br>\n=======================================================<br>\n</font>"
 
         # for each file, report the analytics
-        for sourceFile in assignment.assignmentFiles:
+        for sourceFile in submission.submissionFiles:
             # if we have more than 1 file, then print the filename
-            if assignment.assignmentFiles.size() > 1:
+            if submission.submissionFiles.size() > 1:
                 report += "<font face=\"verdana\" color=\"" + self.__HEADER_COLOR1 + "\">" + sourceFile.getName() + "</font><br>\n"
 
             # analyze the source file
-            if assignment.language == IAGConstant.LANGUAGE_CPP:
+            if submission.language == IAGConstant.LANGUAGE_CPP:
                 cppAnalysis = CodeAnalyzer.analyzeCppFile(os.path.abspath(sourceFile))
                 report += "<font face=\"courier\" color=\"" + self.__ANALYTICS_COLOR1 + "\">Code Lines: " + str(cppAnalysis.numLines)
                 report += "<br>\n~#Comments: " + str(cppAnalysis.numComments) + "<br>\n"
-            elif assignment.language == IAGConstant.LANGUAGE_PYTHON3:
+            elif submission.language == IAGConstant.LANGUAGE_PYTHON3:
                 pythonAnalysis = CodeAnalyzer.analyzePythonFile(os.path.abspath(sourceFile))
                 report += "<font face=\"courier\" color=\"" + self.__ANALYTICS_COLOR1 + "\">Code Lines: " + str(pythonAnalysis.numLines)
                 report += self.__HTML_TAB_CHAR + self.__HTML_TAB_CHAR + "~#Functions:  " + str(pythonAnalysis.numFuncs)
@@ -305,15 +305,15 @@ class ReportGenerator(IAGConstant):
 
 
     # =======================================================================
-    # private void reportSourceCode(Assignment assignment)
+    # private void reportSourceCode(Submission submission)
     # function that inserts the provided source code into the document.
     # ======================================================================
-    def __reportSourceCode(self, assignment):
+    def __reportSourceCode(self, submission):
         # is this a single file or a set of files?
-        bSingleFile = assignment.assignmentFiles.size() == 1
+        bSingleFile = submission.submissionFiles.size() == 1
 
         # for each file, add its html-formatted form to the output file
-        for sourceFile in assignment.assignmentFiles:
+        for sourceFile in submission.submissionFiles:
 
             # extract the filename from the path
             filename = sourceFile.getName()
@@ -324,10 +324,10 @@ class ReportGenerator(IAGConstant):
             # replace every occurrence of '<' with '&lt' in the source file for the syntax highlighter
             source = preprocessedSource.replaceAll("<", "&lt")
 
-            if assignment.language == IAGConstant.LANGUAGE_CPP:
+            if submission.language == IAGConstant.LANGUAGE_CPP:
                 brush = "<pre class=\"brush: cpp;\">"
 
-            elif assignment.language == IAGConstant.LANGUAGE_PYTHON3:
+            elif submission.language == IAGConstant.LANGUAGE_PYTHON3:
                 brush = "<pre class=\"brush: python;\">"
 
             else:
@@ -349,35 +349,35 @@ class ReportGenerator(IAGConstant):
 
 
     # =======================================================================
-    # private void reportOutputs(Assignment assignment)
+    # private void reportOutputs(Submission submission)
     # function that inserts the results of each test case into the
     # document.  These results include execution times, errors and
     # program outputs.
     # ======================================================================
-    def __reportOutputs(self, assignment):
+    def __reportOutputs(self, submission):
 
-        if assignment.assignmentFiles is None or assignment.assignmentFiles.size() == 0:
+        if submission.submissionFiles is None or submission.submissionFiles.size() == 0:
             # no programming files, so no test data output
             return
         else:
             # report any compiler error messages here
-            if assignment.compilerErrors is not None:
-                self.__reportErrorMsg(assignment.compilerErrors)
+            if submission.compilerErrors is not None:
+                self.__reportErrorMsg(submission.compilerErrors)
 
             # if we only have no test files, we still need to report runtime and exec times
             if len(self.__testDataFiles) == 0:
                 # add the corresponding test file output to the document
                 self.__document += "<pre><font face=\"courier\" color=\"" + self.__OUTPUT_COLOR + "\">"
-                if assignment.progOutputs[0] is not None:
-                    self.__document += assignment.progOutputs[0]
+                if submission.progOutputs[0] is not None:
+                    self.__document += submission.progOutputs[0]
                 self.__document += "</font></pre>"
 
                 # report any runtime error messages here
-                if assignment.runtimeErrors[0] is not None:
-                    self.__reportErrorMsg(assignment.runtimeErrors[0])
+                if submission.runtimeErrors[0] is not None:
+                    self.__reportErrorMsg(submission.runtimeErrors[0])
 
-                if assignment.executionTimes[0] is not None:
-                    self.__reportExecutionTime(assignment.executionTimes[0])
+                if submission.executionTimes[0] is not None:
+                    self.__reportExecutionTime(submission.executionTimes[0])
 
             else:
                 # here we have 1 or more test data files to report
@@ -391,16 +391,16 @@ class ReportGenerator(IAGConstant):
 
                     # add the corresponding test file output to the document
                     self.__document += "<pre><font face=\"courier\" color=\"" + self.__OUTPUT_COLOR + "\">"
-                    if assignment.progOutputs[i] is not None:
-                        self.__document += assignment.progOutputs[i]
+                    if submission.progOutputs[i] is not None:
+                        self.__document += submission.progOutputs[i]
                     self.__document += "</font></pre>"
 
                     # report any runtime error messages here
-                    if assignment.runtimeErrors[i] is not None:
-                        self.__reportErrorMsg(assignment.runtimeErrors[i])
+                    if submission.runtimeErrors[i] is not None:
+                        self.__reportErrorMsg(submission.runtimeErrors[i])
 
-                    if assignment.executionTimes[i] is not None:
-                        self.__reportExecutionTime(assignment.executionTimes[i])
+                    if submission.executionTimes[i] is not None:
+                        self.__reportExecutionTime(submission.executionTimes[i])
 
 
     # =======================================================================
@@ -430,32 +430,32 @@ class ReportGenerator(IAGConstant):
 
 
     # =======================================================================
-    # private void insertGradingBoxes(Assignment assignment)
+    # private void insertGradingBoxes(Submission submission)
     # function that creates the instructor grading box.  This box is
     # pre-populated with the student's name.
     # ======================================================================
-    def __insertGradingBoxes(self, assignment):
+    def __insertGradingBoxes(self, submission):
 
         # ensure that we have non-null quantities for the grade and comment
-        grade = '' if assignment.grade is None else str(assignment.grade)
-        instructorComment = '' if assignment.instructorComment is None else assignment.instructorComment
+        grade = '' if submission.grade is None else str(submission.grade)
+        instructorComment = '' if submission.instructorComment is None else submission.instructorComment
 
         # create the grade input text field and comment textarea and populate
-        # them with the associated assignment fields.
+        # them with the associated submission fields.
         self.__document += "<font face=\"courier\" color=\"" + self.__FEEDBACK_COLOR + "\">" \
-                + "<br>Instructor Feedback for " + assignment.studentName \
+                + "<br>Instructor Feedback for " + submission.studentName \
                 + "</font><br><table><tr><td>Grade <i>(int)</i>:<br><input type=\"text\" id=\"" \
-                + assignment.studentName + self.HTML_GRADE_ID_SUFFIX + "\" value=" + grade + "><br><br><br><br></td><td>" \
+                + submission.studentName + self.HTML_GRADE_ID_SUFFIX + "\" value=" + grade + "><br><br><br><br></td><td>" \
                 + "&nbsp;&nbsp;&nbsp;</td><td>Comment:<br><textarea id=\"" \
-                + assignment.studentName + self.HTML_COMMENT_ID_SUFFIX + "\" rows=4 cols=60>" + instructorComment + "</textarea></td></tr></table>"
+                + submission.studentName + self.HTML_COMMENT_ID_SUFFIX + "\" rows=4 cols=60>" + instructorComment + "</textarea></td></tr></table>"
 
 
 
     # =======================================================================
-    # private void reportClosingInfo(ArrayList<Assignment> assignments)
+    # private void reportClosingInfo(ArrayList<Submission> submissions)
     # ======================================================================
-    def __reportClosingInfo(self, assignments):
-        self.__reportErrorMsg("<br><br><b>**** " + assignments.size()
+    def __reportClosingInfo(self, submissions):
+        self.__reportErrorMsg("<br><br><b>**** " + submissions.size()
                 + " project(s) processed. ****</b><br><font face=\"verdana\">"
                 + "Report Generator: AutoGrader v" + AutoGraderApp.VERSION + "<br>"
                 + "C++ Compiler: " + AutoGraderApp.autoGrader.getConfiguration(IAGConstant.AG_CONFIG.CPP_COMPILER) + "<br>"
@@ -646,7 +646,7 @@ class ReportGenerator(IAGConstant):
             ".syntaxhighlighter.collapsed .toolbar span a.expandSource {",
             "  display: inline !important;",
             "}",
-            # 2.0.4 - eliminate syntaxHighlighter link that shows up on the html for each assignment.
+            # 2.0.4 - eliminate syntaxHighlighter link that shows up on the html for each submission.
             #
             # ".syntaxhighlighter .toolbar {",
             # "  position: absolute !important;",
