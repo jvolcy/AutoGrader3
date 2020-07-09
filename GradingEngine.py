@@ -172,13 +172,14 @@ class GradingEngine(IAGConstant):
     def __readFromFile(self, filepath, maxLines = 0):
         console("__readFromFile() " + filepath)
 
+        self.__bLastReadExceedsMaxLines = False
+
         #simulate the overloaded verson of __readFromFile()
         if maxLines == 0:
             return self.__blockReadFromFile(filepath)
 
         #initialize the output string
         text = ""
-        self.__bLastReadExceedsMaxLines = False
 
         #attempt to read the file line by line
         try:
@@ -189,9 +190,10 @@ class GradingEngine(IAGConstant):
             #read the file line by-line until we are out of lines or have
             #reached the max allowed
             readLine = b.readline()      #individual lines in the file
-            while readLine is not None and numLines < maxLines:
+            text = readLine
+            while readLine !='' and numLines < maxLines:
                 readLine = b.readline()
-                text += readLine + "\n"
+                text += readLine
                 numLines += 1
 
             if numLines == maxLines:
@@ -397,14 +399,17 @@ class GradingEngine(IAGConstant):
                 elapsed_time = time.time() - start_time
                 while p.poll() is None and elapsed_time < timeout_sec:
                     elapsed_time = time.time() - start_time
-                    print("*", end='')
+                    #print("*", end='')
                     time.sleep(0.2)
             else:  # user specified 0 or a negative value for the max run time --> wait indefinitely
                 p.wait()  # wait indefinitely for process to terminate
                 elapsed_time = time.time() - start_time
 
+            execResult.execTimeSec = elapsed_time
+
             # kill the process, if it has exceeded its max run time
             if elapsed_time >= timeout_sec and timeout_sec > 0:
+                execResult.bTimedOut = True
                 console("Killing process {0}. Run time exceeds max value of {1} seconds.".format(p.pid, timeout_sec))
                 p.terminate()  # try a s/w termination
                 time.sleep(1)  # wait 1 second
@@ -440,10 +445,10 @@ class GradingEngine(IAGConstant):
 
         # delete the tmp file
         try:
-            #os.remove(tmpFile)
-            pass
+            os.remove(tmpFile)
         except:
-            pass
+            e = sys.exc_info()[0]
+            console("shellExec(): os.remove("+tmpFile+") " + str(e))
 
         return execResult
 

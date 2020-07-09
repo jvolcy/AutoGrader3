@@ -357,6 +357,7 @@ def main():
 
     # 2 set the list of test data and data files here
     agDoc.addTestDataFile('/Users/jvolcy/Documents/Spelman/CIS 113 - Python I/TestData/P1005/P1005-1.txt')
+    agDoc.addTestDataFile('/Users/jvolcy/Documents/Spelman/CIS 113 - Python I/TestData/P1005/P1005-2.txt')
     agDoc.addDataFile('/Users/jvolcy/Documents/words.txt')
 
 

@@ -161,7 +161,7 @@ class AGDocument(object):
         status = self.gradingEngine.getProcessingStatus()
         while status.bRunning == True:
             time.sleep(0.5)
-            print('#')
+            #print('#')
         #time.sleep(2)
 
         # cleanup data files

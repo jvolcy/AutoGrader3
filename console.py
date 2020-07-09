@@ -1,3 +1,5 @@
+import sys
+
 def console(format, *args):
     Console.console(format, *args)
 
@@ -13,6 +15,7 @@ class Console:
         if cls.__consoleFunc == None:
             #print('fmt=', fmt, 'args=', *args)
             print('[x] ' + fmt % args)
+            sys.stdout.flush()
         else:
             cls.__consoleFunc('[c] ' + fmt % args)
 
