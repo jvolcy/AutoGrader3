@@ -209,6 +209,30 @@ def saveConfiguration(self):
 
 
 
+
+# =======================================================================
+# Grading Engine config
+# =======================================================================
+
+def setCppCompiler(self, val):
+    self._agDocument.gradingEngine.setCppCompiler(val)
+
+def setPython3Interpreter(self, val):
+    self._agDocument.gradingEngine.setPython3Interpreter(val)
+
+def setShellInterpreter(self, val):
+    self._agDocument.gradingEngine.setShellInterpreter(val)
+
+def setTempOutputDirectory(self, val):
+    self._agDocument.gradingEngine.setTempOutputDirectory(val)
+
+def setMaxOutputLines(self, val):
+    self._agDocument.gradingEngine.setMaxOutputLines(val)
+
+def setMaxRunTime(self, val):
+    self._agDocument.gradingEngine.setMaxRunTime(val)
+
+
 # =======================================================================
 # xxx
 # =======================================================================

@@ -9,10 +9,28 @@ from AGDocument import AGDocument
 
 
 # =======================================================================
-# AutoGraderApp class
+# AutoGrader3 class
+#
+# Structure of AutoGrader3 class
+#
+# AutoGrader3 classes ("has a")
+# 	AGDocument
+# 	Simulator, MoodleClient, CanvasClient, etc.  all implement (IDataStore)
+# 	GradingEngine
+# 	MossClient
+# 	ReportGenerator
+# 	IAssignmentStore (implements: assignmentName, assignmentDirectory, [[assignmentFiles], studentName, studentID, submitGrade(grade, msg)], setWorkingDirectory() )
+#
+# AutoGrader3 files structure -> what objects/functions the file manages
+# 	_agConfig.py -> misc configurations
+# 	_agLmsInterface.py -> Moodle, Canvas, Simulator
+# 	_agGrader.py -> pre-processing, GradingEngine, MossClient
+# 	_agReport.py -> ReportGenerator, CodeAnalyzer, teacher grade & feedback
+#
 # =======================================================================
 class AutoGrader3(IAGConstant):
 
+    # General configurations
     from ._agConfig import _autoLocateCppCompiler
     from ._agConfig import _autoLocatePython3Interpreter
     from ._agConfig import _autoLocateShell
@@ -21,6 +39,31 @@ class AutoGrader3(IAGConstant):
     from ._agConfig import getConfiguration
     from ._agConfig import saveConfiguration
     from ._agConfig import setConfiguration
+
+    # Grading Engine configurations
+    from ._agConfig import setCppCompiler
+    from ._agConfig import setPython3Interpreter
+    from ._agConfig import setShellInterpreter
+    from ._agConfig import setTempOutputDirectory
+    from ._agConfig import setMaxOutputLines
+    from ._agConfig import setMaxRunTime
+
+    # Grading Engine module functions
+    from ._agGrader import _setAssignmentName
+    from ._agGrader import _cleanupDataFiles
+    from ._agGrader import _discoverPrimaryAssignmentFile
+    from ._agGrader import _prepareDataFiles
+    from ._agGrader import addAssignment
+    from ._agGrader import addDataFile
+    from ._agGrader import addTestDataFile
+    from ._agGrader import breakOutTestFiles
+    from ._agGrader import grade
+
+    # LMS interface functions
+    from ._agLmsInterface import getAssignmentsFromLms
+    from ._agLmsInterface import submitAssignmentsToLms
+    from ._agLmsInterface import setWorkingDirectory
+
 
     # =======================================================================
     # AutoGraderApp()
@@ -49,12 +92,13 @@ class AutoGrader3(IAGConstant):
         # ---------- initialize the grading engine ----------
         self._agDocument = AGDocument()
 
+        # ---------- initialize other class members ----------
 
     # =======================================================================
     # public AGDocument getAgDocument()
     # =======================================================================
-    def getAgDocument(self):
-        return self._agDocument
+    #def getAgDocument(self):
+    #    return self._agDocument
 
 
     # =======================================================================
