@@ -7,8 +7,8 @@ class Assignment(object):
         # ---------- general members ----------
         self.studentName = ''
         self.assignmentDirectory = ''
-        self.assignmentFiles = [] # array of file objects
-        self.primaryAssignmentFile = None # file object
+        self.assignmentFiles = []  # array of file objects
+        self.primaryAssignmentFile = None  # file object
         self.language = ''
         # ---------- code analysis members ----------
         # self.linesOfCode = 0

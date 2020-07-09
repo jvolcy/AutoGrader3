@@ -1,8 +1,8 @@
 from IAGConstant import IAGConstant
 from console import console
-# from AutoGrader3 import AutoGrader3
-# import GradingEngine
-
+from AutoGrader3 import AutoGrader3
+from Assignment import Assignment
+from pathlib import Path
 
 autoGrader =  None
 APP_NAME = "Spelman AutoGrader 3"
@@ -16,6 +16,7 @@ copyrightText = "copyright 2016-2020"
 credits = "J Volcy"
 '''
 
+"""
 # from tkinter import *
 from tkinter import *
 import tkinter.ttk as ttk
@@ -94,10 +95,10 @@ class Controller(IAGConstant):
     # ======================================================================
     def __buildMainFrames(self):
         # build Settings frame
-        #TEMP self.__buildSettingsFrame()
+        self.__buildSettingsFrame()
 
         # build Input frame
-        #TEMP self.__buildInputFrame()
+        self.__buildInputFrame()
 
         # build Output frame
         self.__buildOutputFrame()
@@ -333,6 +334,7 @@ class Controller(IAGConstant):
 
     def __btnOutputClick(self):
         self.__outputFrame.lift()
+"""
 
 # =======================================================================
 # public static void main(String[] args)
@@ -343,11 +345,82 @@ def main():
     console("main...")
 
     #console('%d, %f', 3, 4.3)
-    # TEMP  autoGrader = AutoGrader3()
+    autoGrader = AutoGrader3()
 
-    controller = Controller()
+    #controller = Controller()
+
+    #get the AG Document
+
+    # 1 set the name of the assignment here
+    agDoc = autoGrader.getAgDocument()
+    agDoc.assignmentName = "P1005 Test Assignment"
+
+    # 2 set the list of test data and data files here
+    agDoc.addTestDataFile('/Users/jvolcy/Documents/Spelman/CIS 113 - Python I/TestData/P1005/P1005-1.txt')
+    agDoc.addDataFile('/Users/jvolcy/Documents/words.txt')
 
 
+    # 3 Add assignments to the AGDocument's grading engine here
+
+    # -----------------------------------------------------------
+    # TEST ASSIGNMENT #1
+    assignment = Assignment()
+    assignment.assignmentDirectory = "/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005/Abiodun Scott"
+    #assignment.assignmentFiles.append(assignment.assignmentDirectory  + '/' + "P1005.py")
+    assignment.assignmentFiles.append("P1005.py")
+    # assignment.bAutoGraded = True
+    assignment.language = 'Python 3'
+    assignment.studentName = 'Abiodun Scott'
+
+    # add assignments
+    agDoc.addAssignment(assignment)
+
+    # -----------------------------------------------------------
+    # TEST ASSIGNMENT #2
+    assignment = Assignment()
+    assignment.assignmentDirectory = "/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005/Adia Haynes"
+    #assignment.assignmentFiles.append(assignment.assignmentDirectory  + '/' + "P1005.py")
+    assignment.assignmentFiles.append("P1005.py")
+    # assignment.bAutoGraded = True
+    assignment.language = 'Python 3'
+    assignment.studentName = 'Adia Haynes'
+
+    # add assignments
+    agDoc.addAssignment(assignment)
+
+    # -----------------------------------------------------------
+    # TEST ASSIGNMENT #3
+    assignment = Assignment()
+    assignment.assignmentDirectory = "/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005/Amore Daniels"
+    #assignment.assignmentFiles.append(assignment.assignmentDirectory  + '/' + "P1005 - Spellchecker.py")
+    assignment.assignmentFiles.append("P1005 - Spellchecker.py")
+    # assignment.bAutoGraded = True
+    assignment.language = 'Python 3'
+    assignment.studentName = 'Amore Daniels'
+
+    # add assignments
+    agDoc.addAssignment(assignment)
+
+    # -----------------------------------------------------------
+
+
+    # 4 ---------- Configure the Grading Engine ----------
+    agDoc.gradingEngine.setCppCompiler(autoGrader.getConfiguration(autoGrader.AG_CONFIG.CPP_COMPILER))
+    agDoc.gradingEngine.setPython3Interpreter(autoGrader.getConfiguration(autoGrader.AG_CONFIG.PYTHON3_INTERPRETER))
+    agDoc.gradingEngine.setShellInterpreter(autoGrader.getConfiguration(autoGrader.AG_CONFIG.SHELL))
+    agDoc.gradingEngine.setTempOutputDirectory(str(Path.home()))  #use the home directory as the temp directory
+    agDoc.gradingEngine.setMaxOutputLines(int(autoGrader.getConfiguration(autoGrader.AG_CONFIG.MAX_OUTPUT_LINES)))
+    agDoc.gradingEngine.setMaxRunTime(int(autoGrader.getConfiguration(autoGrader.AG_CONFIG.MAX_RUNTIME)))
+
+
+    # 5 Execute the grading
+    agDoc.grade()
+
+    # 6 Retrieve the html report
+    htmlReport = agDoc.htmlReport
+    print(">>",htmlReport[:1000], "<<")
+
+    autoGrader.saveConfiguration()
 
     # ** THIS IS WHERE WE GATHER THE INFORMATION NORMALLY GATHERED THROUGH THE GUI.
     # THEN, EXECUTE THE GRADING ENGINE

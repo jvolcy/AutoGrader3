@@ -1,26 +1,17 @@
 import sys
 import os
 import subprocess
+import json
+from pathlib import Path
 from IAGConstant import IAGConstant
 from console import console
-from GradingEngine import GradingEngine
+from AGDocument import AGDocument
 
-# =======================================================================
-# AGDocument class
-# =======================================================================
-class AGDocument(object):
-    def __init__(self):
-        self.assignmentName = ''
-        self.gradingEngine = None       # a GradingEngine() object
-        self.htmlReport = ''
-        self.moodleDirectory = None     # a File object
-        self.testDataFiles = []         # a list of file objects the length of this list is the # of test cases
 
 # =======================================================================
 # AutoGraderApp class
 # =======================================================================
 class AutoGrader3(IAGConstant):
-
 
     # =======================================================================
     # AutoGraderApp()
@@ -30,19 +21,24 @@ class AutoGrader3(IAGConstant):
         # private GradingEngine gradingEngine
         console("AutoGraderApp constructor...")
 
+
         # ---------- AutoGrader options ----------
         self.__ag_config = {}
 
         # ---------- set the path to the JSON config file ----------
         self.__configFileName = IAGConstant.CONFIG_FILENAME
-        console("Config file path = '" + self.__configFileName + "'")
+
+        #get the user's home directory and set the path to the config file
+        home = str(Path.home())
+        home = home.rstrip('/')  #remove the trailing '/' if it is present
+        self.configFile = home + '/' + self.__configFileName
+        console("Config file path = '" + self.configFile + "'")
 
         # ---------- setup app configurations ----------
         self.__setupConfiguration()
 
         # ---------- initialize the grading engine ----------
         self.__agDocument = AGDocument()
-        self.__agDocument.gradingEngine = GradingEngine()
 
 
     # =======================================================================
@@ -65,7 +61,7 @@ class AutoGrader3(IAGConstant):
             # first, use "which python3" to try to find a Python 3 interpreter
             p = subprocess.Popen('which python3', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             p.wait()
-            python3Path = str(p.stdout.read())
+            python3Path = p.stdout.read().decode("UTF-8").strip()
 
             # if "which python3" did not yield a suitable interpreter, check for one at /usr/local/bin/python3.
             if python3Path == '':
@@ -76,7 +72,7 @@ class AutoGrader3(IAGConstant):
 
         except:
             e = sys.exc_info()[0]
-            console("autoLocatePython3Interpreter(): " + e.toString())
+            console("autoLocatePython3Interpreter(): " + str(e))
 
 
         return python3Path
@@ -100,23 +96,23 @@ class AutoGrader3(IAGConstant):
             # use "which g++" to try to find a c++ compiler
             p = subprocess.Popen('which g++', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             p.wait()
-            cppPath = str(p.stdout.read())
+            cppPath = p.stdout.read().decode("UTF-8").strip()
 
             # if "which g++" did not yield a suitable compiler, check for 'c++'
             if cppPath == '':
                 p = subprocess.Popen('which c++', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 p.wait()
-                cppPath = str(p.stdout.read())
+                cppPath = p.stdout.read().decode("UTF-8").strip()
 
             # if still not found, check for 'cpp'
             if cppPath == '':
                 # use "which c++" to try to find a Python 3 interpreter
                 p = subprocess.Popen('which cpp', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 p.wait()
-                cppPath = str(p.stdout.read())
+                cppPath = p.stdout.read().decode("UTF-8").strip()
         except:
             e = sys.exc_info()[0]
-            console("autoLocateCppCompiler(): " + e.toString())
+            console("autoLocateCppCompiler(): " + str(e))
 
         return cppPath
 
@@ -129,18 +125,18 @@ class AutoGrader3(IAGConstant):
         try:
             p = subprocess.Popen('which bash', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             p.wait()
-            shellPath = str(p.stdout.read())
+            shellPath = p.stdout.read().decode("UTF-8").strip()
 
             # if "which bash" did not yield a suitable shell, check for 'sh'
             if shellPath == '':
                 # use "which sh" to try to find a shell interpreter
                 p = subprocess.Popen('which sh', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 p.wait()
-                shellPath = str(p.stdout.read())
+                shellPath = p.stdout.read().decode("UTF-8").strip()
 
         except:
             e = sys.exc_info()[0]
-            console("autoLocateShell(): " + e.toString())
+            console("autoLocateShell(): " + str(e))
 
 
         return shellPath
@@ -218,7 +214,20 @@ class AutoGrader3(IAGConstant):
     # configFileName is the full path of the JSON configuration file.
     # =======================================================================
     def __loadConfiguration(self):
-        console('[AutoGrader3:__loadConfiguration() stub]')
+
+        console("AutoGrader3: Loading configuration from " + str(self.configFile))
+        try:
+            with open(self.configFile) as f:
+                config = json.load(f)
+
+            for item in config:
+                self.__ag_config[item] = config[item]
+
+        except:
+            #if the file does not exist, or is otherwise inaccessible, do nothing
+            console("Warning: unable to source " + self.configFile)
+            return
+
         '''
         # read and parse the config file
         try:
@@ -255,7 +264,13 @@ class AutoGrader3(IAGConstant):
     # configFileName is the full path of the JSON configuration file.
     # =======================================================================
     def saveConfiguration(self):
-        console('[AutoGrader3:saveConfiguration() stub]')
+
+        console("AutoGrader3: Saving configuration to " + str(self.configFile))
+
+        with open(self.configFile, 'w') as json_file:
+            json.dump(self.__ag_config, json_file)
+
+
         '''
         console("Saving " + configFileName)
         # creating JSONObject

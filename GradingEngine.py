@@ -3,7 +3,8 @@ from console import console
 import subprocess
 import os
 import sys
-#import GradingEngine
+import time
+import threading
 
 #import static AutoGraderApp.Controller.message;
 
@@ -25,7 +26,7 @@ class shellExecResult(object):
 # inside the running process.
 # ======================================================================
 class ProcessingStatus(object):
-    def __init__(self, bRunning = False, message, progress, startVal, endVal):
+    def __init__(self, bRunning, message, progress, startVal, endVal):
         self.bRunning = bRunning
         self.message = message
         self.progress = progress
@@ -61,10 +62,10 @@ class GradingEngine(IAGConstant):
         self.__cppCompiler = None
         self.__python3Interpreter = None
         self.__shell = None
-        self.__processingStatus = None
+        self.processingStatus = ProcessingStatus(False, "", 0, 0, 0)
 
-        self.__bAbortRequest = None
-        self.__gradingService = None
+        self.bAbortRequest = None
+        self.__gradingServiceThread = None
         self.__bLastReadExceedsMaxLines = None
         self.__MAX_COMPILE_TIME_SEC = 10
         self.__MAX_COMPILER_OUTPUT_LINES = 200
@@ -74,7 +75,7 @@ class GradingEngine(IAGConstant):
     # public ProcessingStatus getProcessingStatus()
     # ======================================================================
     def getProcessingStatus(self):
-        return self.__processingStatus
+        return self.processingStatus
 
 
     # =======================================================================
@@ -143,6 +144,7 @@ class GradingEngine(IAGConstant):
     # private String readFromFile(String filepath)
     # ======================================================================
     def __blockReadFromFile(self, filepath):
+        console("__blockReadFromFile() " + filepath)
         self.__bLastReadExceedsMaxLines = False
         try:
             inFile = open(filepath, 'rt')
@@ -151,7 +153,7 @@ class GradingEngine(IAGConstant):
             return text
         except:
             e = sys.exc_info()[0]
-            console("readFromFile(): " + str(e))
+            console("__blockReadFromFile(): " + str(e))
 
         return None
 
@@ -168,6 +170,7 @@ class GradingEngine(IAGConstant):
     # set maxLines to 0 to read the entire file.  This is the default.
     # ======================================================================
     def __readFromFile(self, filepath, maxLines = 0):
+        console("__readFromFile() " + filepath)
 
         #simulate the overloaded verson of __readFromFile()
         if maxLines == 0:
@@ -196,7 +199,7 @@ class GradingEngine(IAGConstant):
 
         except:
             e = sys.exc_info()[0]
-            console("readFromFile():" + str(e))
+            console("__readFromFile(): " + str(e))
 
         return text
 
@@ -244,25 +247,24 @@ class GradingEngine(IAGConstant):
     def __getPidFromToken(self, token):
         pids = []
         try:
-            p = subprocess.check_output('ps -eo pid,command', shell=True)
-            p.waitFor(1, TimeUnit.SECONDS);
+            out = subprocess.Popen(['ps', '-eo', 'pid,command'],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT)
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            stdout, stderr = out.communicate()
+            # print("stderr = ", stderr)
+            stdoutList = stdout.decode("utf-8").split('\n')
 
-            String line;
-            while ((line = reader.readLine()) != null):
-                # check for the token
+            for line in stdoutList:
                 if token in line:
-                    String pidStr = line.trim().split(" ")[0];
-                    pids.add( Integer.valueOf(pidStr) );
-                    #console(pidStr + "-->" + line.trim().split(" ")[1]);
+                    pidStr = line.strip().split(" ")[0]
+                    pids.append(int(pidStr))
+                    #console(pidStr + "-->" + line.strip().split(" ")[1])
         except:
             e = sys.exc_info()[0]
-            console("getPidFromToken():" + str(e));
+            #console("getPidFromToken():" + str(e))
 
-        return pids;
-
-
+        return pids
 
     # =======================================================================
     # private shellExecResult compileCppFiles(String compiler, ArrayList<File>sourceFiles, File exeFile, Integer timeoutSec, Integer maxOutputLines)
@@ -306,7 +308,7 @@ class GradingEngine(IAGConstant):
 
         #perform the compilation
         console("compiling:" + compile_args)
-        execResult = shellExec(compile_args, timeoutSec, maxOutputLines, os.path.abspath(exeFile), exeFile.getParent())
+        execResult = self.__shellExec(compile_args, timeoutSec, maxOutputLines, os.path.abspath(exeFile), exeFile.getParent())
 
         return execResult
 
@@ -334,29 +336,22 @@ class GradingEngine(IAGConstant):
         execResult.bMaxLinesExceeded = False
         execResult.execTimeSec = 0.0
 
-        #create a temp file to capture program output
-        File tmpFile = new File(tempOutputDirectory + "/TEMP.AG2");
+        # create a temp file to capture program output
+        tmpFile = self.__tempOutputDirectory + "/TEMP.AG2"
 
-        # delete any previous temp file in the output directory.
-        try:
-            # delete the temporary file if it exists, ignoring any "file not found" errors.
-            tmpFile.delete();
-        except:
-            # ignore errors from the delete operation
-            pass
+        # form the command string, redirecting both stdout and stderr to the temporary file
+        cmd = [self.__shell, "-c", args + " >> \"" + tmpFile + "\" 2>&1"]
+        cmd = [args + " >> \"" + tmpFile + "\" 2>&1"]
 
-
-        #form the command string, redirecting both stdout and stderr to the temporary file
-        cmd = [shell, "-c", args + " >> \"" + tmpFile.getPath() + "\" 2>&1"]
-
-        #concatenate the cmd array string for display on the console
+        # concatenate the cmd array string for display on the console
         cmdStr = ""
         for s in cmd:
             cmdStr += s + " "
 
-        #xxx console("Executing " + args + "\n  as  " + cmdStr );
+        console("Executing " + args + "\n  as  " + cmdStr)
 
         try:
+            '''
             #attempt to execute the command
             elpasedTime = System.currentTimeMillis();
 
@@ -393,22 +388,64 @@ class GradingEngine(IAGConstant):
                     killCmd = "kill -9 " + str(pid)
                     console(killCmd);
                     Runtime.getRuntime().exec(killCmd)
+                '''
+            start_time = time.time()
+            p = subprocess.Popen(args=cmdStr, shell=True,
+                                 cwd=workingDirectory)  # the pid returned appears to be the pid of the shell
+
+            if timeout_sec > 0:
+                elapsed_time = time.time() - start_time
+                while p.poll() is None and elapsed_time < timeout_sec:
+                    elapsed_time = time.time() - start_time
+                    print("*", end='')
+                    time.sleep(0.2)
+            else:  # user specified 0 or a negative value for the max run time --> wait indefinitely
+                p.wait()  # wait indefinitely for process to terminate
+                elapsed_time = time.time() - start_time
+
+            # kill the process, if it has exceeded its max run time
+            if elapsed_time >= timeout_sec and timeout_sec > 0:
+                console("Killing process {0}. Run time exceeds max value of {1} seconds.".format(p.pid, timeout_sec))
+                p.terminate()  # try a s/w termination
+                time.sleep(1)  # wait 1 second
+                p.kill()  # force the termination
+
+                # force the issue by killing all identified processes with
+                # a unix kill command.
+
+                # attempt to detect the PIDs of the launched shell and command
+                pids = self.__getPidFromToken(identifyingToken)
+                for pid in pids:
+                    killCmd = "kill -9 " + str(pid)
+                    console(killCmd);
+                    os.system(killCmd)
+
+                console(
+                    "Maximum execution time of {0} seconds exceeded.  Process forcefully terminated... output may be lost.".format(
+                        timeout_sec))
+
+            # copy the first maxOutputLines from the temp file to the output file
+            # Also, limit the # bytes to 40*maxOutputLines (this avoids large output files due to ridiculously long lines)
+            # self._fileHead(tmpFile, outputFile, maxOutputLines, 40*maxOutputLines)
+            # self._removeFile(tmpFile)
 
         except:
             e = sys.exc_info()[0]
             console("shellExec(): " + str(e))
 
-
-        #read in the output of the executed command from the temp file
-        execResult.output = readFromFile(tmpFile, maxOutputLines)
+        # read in the output of the executed command from the temp file
+        execResult.output = self.__readFromFile(tmpFile, maxOutputLines)
         if self.__bLastReadExceedsMaxLines:
             execResult.bMaxLinesExceeded = True
 
-        #delete the tmp file
-        tmpFile.delete()
+        # delete the tmp file
+        try:
+            #os.remove(tmpFile)
+            pass
+        except:
+            pass
 
         return execResult
-
 
     # =======================================================================
     # private void pythonSubProcess(Assignment assignment, int numTests, boolean bNoTestFiles)
@@ -424,7 +461,8 @@ class GradingEngine(IAGConstant):
         if assignment.primaryAssignmentFile is None:
             return
 
-        sourceFile = os.path.abspath(assignment.primaryAssignmentFile)
+        #sourceFile = os.path.abspath(assignment.primaryAssignmentFile)
+        sourceFile = assignment.primaryAssignmentFile
 
         # we have to add logic that handles the case where no test files are required differently
         # from the cases where test files are needed.  In the former case, there is no input
@@ -435,12 +473,13 @@ class GradingEngine(IAGConstant):
         for i in range(numTests):
             # use bNoTestFiles to determine the format of the command string, cmd
             if bNoTestFiles:
+                console("Warning: no test files.")
                 # if we have no test files, do not include input redirection in the exec command
                 cmd = "\"" + self.__python3Interpreter + "\" " + \
                         "\"" + sourceFile + "\""
             else:
                 # we have test files: use them to redirect stdin in the exec command
-                dataFileName = os.path.abspath(testDataFiles.get(i))
+                dataFileName = os.path.abspath(self.testDataFiles[i])
                 cmd = "\"" + self.__python3Interpreter + "\" " + \
                         "\"" + sourceFile + "\"" + " < \"" + dataFileName + "\""
 
@@ -476,7 +515,7 @@ class GradingEngine(IAGConstant):
     def __cppSubProcess(self, assignment, numTests, bNoTestFiles):
         console("cppSubProcess: " + assignment.studentName)
 
-        File exeFile = new File(assignment.assignmentDirectory + "/AG.out")
+        exeFile = assignment.assignmentDirectory + "/AG.out"
 
         # Compile the source once.
         execResult = self.__compileCppFiles(self.__cppCompiler, assignment.assignmentFiles, exeFile, self.__MAX_COMPILE_TIME_SEC, self.__MAX_COMPILER_OUTPUT_LINES)
@@ -502,7 +541,7 @@ class GradingEngine(IAGConstant):
                 cmd = "\"" + exeFile + "\" "
             else:
                 # we have test files: use them to redirect stdin in the exec command
-                dataFileName = os.path.abspath(testDataFiles.get(i))
+                dataFileName = os.path.abspath(self.testDataFiles[i])
                 cmd = "\"" + exeFile + "\" " + " < \"" + dataFileName + "\""
 
 
@@ -532,7 +571,7 @@ class GradingEngine(IAGConstant):
     # private void execAssignment(Assignment assignment)
     #
     # ======================================================================
-    def __execAssignment(self, assignment):
+    def execAssignment(self, assignment):
         # numTests = the number of test cases.  This is either 1 if there
         # are no test files, or equal to the # of test files.
         # int numTests;
@@ -557,6 +596,7 @@ class GradingEngine(IAGConstant):
                 # here, numTests > 0.  Set bNoTestFiles to false
                 bNoTestFiles = False
 
+        console("bNoTestFilesc = " + str(bNoTestFiles))
         # create arrays to hold test results
         assignment.runtimeErrors = [''] * numTests
         assignment.progOutputs = [''] * numTests
@@ -591,45 +631,13 @@ class GradingEngine(IAGConstant):
     # - testDataFiles, if required
     # ======================================================================
     def processAssignments(self):
-        self.__bAbortRequest = False
-        processingStatus = ProcessingStatus(true, "", 1, 1, len(self.assignments))
+        self.bAbortRequest = False
+        self.processingStatus = ProcessingStatus(True, "", 1, 1, len(self.assignments))
 
         #---------- start the grading service ----------
-        gradingService = GradingService()
-        message("Attempting to launch grading service...")
-        gradingService.start()
-
-
-
-
-    # =======================================================================
-    # xxx
-    # ======================================================================
-    class GradingService(object):
-
-        @Override
-        protected Task<Void> createTask() {
-            return new Task<Void>() {
-                @Override
-                protected Void call() throws Exception {
-
-                    #xxx console("Grading service started...");
-                    for (Assignment assignment : assignments) {
-                        processingStatus.message = assignment.studentName;
-                        execAssignment(assignment);
-                        processingStatus.progress++;
-
-                        #if a request is made to stop processing, break out of the loop
-                        if (bAbortRequest) break;
-                    }
-
-                    #indicate that the thread is done.
-                    processingStatus.bRunning = false;
-                    console("Grading thread ending...");
-                    return null;
-                }
-            };
-        }
+        self.__gradingServiceThread = threading.Thread(target=gradingServiceThread, args=(self,))
+        console("Attempting to launch grading service...")
+        self.__gradingServiceThread.start()
 
 
 
@@ -647,18 +655,20 @@ class GradingEngine(IAGConstant):
             console("assignmentDirectory = " + assignment.assignmentDirectory)
             console("language = " + assignment.language)
 
-            console(assignment.assignmentFiles.size() + " assignmentFiles:")
+            console(str(len(assignment.assignmentFiles)) + " assignmentFiles:")
             for f in assignment.assignmentFiles:
-                console("\t" + os.path.abspath(f))
+                console("\t" + f)
 
-            console("primaryAssignmentFile = " + assignment.primaryAssignmentFile)
+            console("primaryAssignmentFile = " + str(assignment.primaryAssignmentFile))
+
+            print(self.testDataFiles)
 
             if assignment.assignmentFiles is not None:           # TEMP*******
                 if len(assignment.assignmentFiles) == 0:
                     console("No programming files found.")
                 else:
-                    for i  in range (len(self.testDataFiles)):
-                        console("---> Results for test file %s: ", self.testDataFiles.[i].getName())
+                    for i in range (len(self.testDataFiles)):
+                        console("---> Results for test file %s: ", self.testDataFiles[i])
                         if assignment.runtimeErrors is not None:
                             console("Compiler/Limit Errors: %s", assignment.runtimeErrors[i])
 
@@ -668,7 +678,7 @@ class GradingEngine(IAGConstant):
                         if assignment.executionTimes is not None:
                             console("Execution Time: %s sec.", assignment.executionTimes[i])
 
-            console("bAudograded = %s", assignment.bAutoGraded)
+            console("bAutograded = %s", assignment.bAutoGraded)
             console("grade = %d", assignment.grade)
             console("instructorComment = " + assignment.instructorComment)
 
@@ -677,9 +687,37 @@ class GradingEngine(IAGConstant):
     # public void abortGrading()
     # ======================================================================
     def abortGrading(self):
-        self.__bAbortRequest = True
+        self.bAbortRequest = True
 
 
+
+
+
+# =======================================================================
+# xxx
+# ======================================================================
+def gradingServiceThread(gradingEngine):
+
+    console("gradingServiceThread() running...")
+
+    #gradingEngine.dumpAssignments()
+
+    for assignment in gradingEngine.assignments:
+        console("Processing " + assignment.studentName)
+        gradingEngine.processingStatus.message = assignment.studentName
+        gradingEngine.execAssignment(assignment)
+        gradingEngine.processingStatus.progress += 1
+
+        #if a request is made to stop processing, break out of the loop
+        if gradingEngine.bAbortRequest:
+            break
+
+    gradingEngine.dumpAssignments()
+
+    #indicate that the thread is done.
+    gradingEngine.processingStatus.bRunning = False
+    console("Grading thread ending...")
+    return
 
 
 

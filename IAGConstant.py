@@ -49,7 +49,7 @@ class IAGConstant(object):
 
     # ---------- Misc Constants ----------
     TEST_CASE_SEPARATOR = "@@\n"
-    CONFIG_FILENAME = "ag3Config.json"
+    CONFIG_FILENAME = ".ag3Config.json"
     DEFAULT_MAIN_PYTHON_FILE = "main.py"
 
 
