@@ -158,11 +158,14 @@ class AGDocument(object):
         console("Processing assignments...")
         self.gradingEngine.processAssignments()
 
+        # grading happens is a separate thread.  We can monitor the state of that thread through the status
+        # variable returned by gradingEngine.getProcessingStatus()
         status = self.gradingEngine.getProcessingStatus()
+
+        # wait for grading thread to complete
         while status.bRunning == True:
             time.sleep(0.5)
             #print('#')
-        #time.sleep(2)
 
         # cleanup data files
-        #self.__cleanupDataFiles()
+        self.__cleanupDataFiles()

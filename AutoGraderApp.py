@@ -367,9 +367,7 @@ def main():
     # TEST ASSIGNMENT #1
     assignment = Assignment()
     assignment.assignmentDirectory = "/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005/Abiodun Scott"
-    #assignment.assignmentFiles.append(assignment.assignmentDirectory  + '/' + "P1005.py")
     assignment.assignmentFiles.append("P1005.py")
-    # assignment.bAutoGraded = True
     assignment.language = 'Python 3'
     assignment.studentName = 'Abiodun Scott'
 
@@ -380,9 +378,7 @@ def main():
     # TEST ASSIGNMENT #2
     assignment = Assignment()
     assignment.assignmentDirectory = "/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005/Adia Haynes"
-    #assignment.assignmentFiles.append(assignment.assignmentDirectory  + '/' + "P1005.py")
     assignment.assignmentFiles.append("P1005.py")
-    # assignment.bAutoGraded = True
     assignment.language = 'Python 3'
     assignment.studentName = 'Adia Haynes'
 
@@ -393,9 +389,7 @@ def main():
     # TEST ASSIGNMENT #3
     assignment = Assignment()
     assignment.assignmentDirectory = "/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005/Amore Daniels"
-    #assignment.assignmentFiles.append(assignment.assignmentDirectory  + '/' + "P1005 - Spellchecker.py")
     assignment.assignmentFiles.append("P1005 - Spellchecker.py")
-    # assignment.bAutoGraded = True
     assignment.language = 'Python 3'
     assignment.studentName = 'Amore Daniels'
 
