@@ -1,6 +1,7 @@
 from console import console
 import os, sys, time
 from shutil import copy
+from pathlib import Path
 
 # =======================================================================
 # 
@@ -122,9 +123,23 @@ def _discoverPrimarySubmissionFile(self, submission):
     return
 
 # =======================================================================
+# _updateAutoGraderConfiguration
+# =======================================================================
+def _updateAutoGraderConfiguration(self):
+    self.setCppCompiler(self.getConfiguration(self.AG_CONFIG.CPP_COMPILER))
+    self.setPython3Interpreter(self.getConfiguration(self.AG_CONFIG.PYTHON3_INTERPRETER))
+    self.setShellInterpreter(self.getConfiguration(self.AG_CONFIG.SHELL))
+    self.setTempOutputDirectory(str(Path.home()))  #use the home directory as the temp directory
+    self.setMaxOutputLines(int(self.getConfiguration(self.AG_CONFIG.MAX_OUTPUT_LINES)))
+    self.setMaxRunTime(int(self.getConfiguration(self.AG_CONFIG.MAX_RUNTIME)))
+
+
+# =======================================================================
 # grade()
 # =======================================================================
 def grade(self):
+    self._updateAutoGraderConfiguration()
+
     # copy data files to each submission directory
     self._prepareDataFiles()
 

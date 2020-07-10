@@ -1,20 +1,40 @@
-from console import console
+import Submission
+#import Assignment
+# =======================================================================
+# =======================================================================
+
+# =======================================================================
+# set the lms interface object
+# =======================================================================
+def setLms(self, lmsInterface):
+    self._lmsInterface = lmsInterface
 
 
 # =======================================================================
-# implements: assignmentName, assignmentDirectory, [[assignmentFiles], studentName, studentID, submitGrade(grade, msg)], setWorkingDirectory() )
-# #
+# function to retrieve assignments from the LMS and transfer contents
+# to the AGDocument object.  You must specify the language used for the
+# assignment
 # =======================================================================
-
-# function to retrieve assignments from the LMS
-# returns an assignment name, assignment ID and a list of assignments
 def getAssignmentFromLms(self):
-    return None
+    self._assignment = self._lmsInterface.getAssignmentFromLms()
+    self._agDocument.assignmentName = self._assignment.assignmentName
+    self._agDocument.gradingEngine.submissions = self._assignment.submissions
 
-# function to submit graded assignments back to the LMS
-def submitAssignmentToLms(self, assignmentID, assignments):
-    return
 
+# =======================================================================
+# function to transfer contents from the AGDocument to
+# the assignment object and submit back to the LMS
+# =======================================================================
+def submitAssignmentToLms(self, assignment):
+    self._lmsInterface.submitAssignmentToLms(assignment)
+
+
+# =======================================================================
 # specify a place where the LMS can download and store assignment files
-def setWorkingDirectory(self, dir):
-    return
+# =======================================================================
+def setAssignmentDirectory(self, dir):
+    self._lmsInterface.setAssignmentDirectory(dir)
+
+
+# =======================================================================
+# =======================================================================

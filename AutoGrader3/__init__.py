@@ -1,12 +1,6 @@
-import sys
-import os
-import subprocess
-import json
-from pathlib import Path
 from IAGConstant import IAGConstant
 from console import console
 from AGDocument import AGDocument
-
 
 # =======================================================================
 # AutoGrader3 class
@@ -15,11 +9,11 @@ from AGDocument import AGDocument
 #
 # AutoGrader3 classes ("has a")
 # 	AGDocument
-# 	Simulator, MoodleClient, CanvasClient, etc.  all implement (IDataStore)
+# 	Simulator, MoodleClient, CanvasClient, etc.  all implement (IAssignmentStore)
 # 	GradingEngine
 # 	MossClient
 # 	ReportGenerator
-# 	ISubmissionStore (implements: submissionName, submissionDirectory, [[submissionFiles], studentName, studentID, submitGrade(grade, msg)], setWorkingDirectory() )
+# 	IAssignmentStore (implements: submissionName, submissionDirectory, [[submissionFiles], studentName, studentID, submitGrade(grade, msg)], setWorkingDirectory() )
 #
 # AutoGrader3 files structure -> what objects/functions the file manages
 # 	_agConfig.py -> misc configurations
@@ -49,6 +43,7 @@ class AutoGrader3(IAGConstant):
     from ._agConfig import setMaxRunTime
 
     # Grading Engine module functions
+    from ._agGrader import _updateAutoGraderConfiguration
     from ._agGrader import _setAssignmentName
     from ._agGrader import _cleanupDataFiles
     from ._agGrader import _discoverPrimarySubmissionFile
@@ -60,9 +55,10 @@ class AutoGrader3(IAGConstant):
     from ._agGrader import grade
 
     # LMS interface functions
+    from ._agLmsInterface import setLms
     from ._agLmsInterface import getAssignmentFromLms
     from ._agLmsInterface import submitAssignmentToLms
-    from ._agLmsInterface import setWorkingDirectory
+    from ._agLmsInterface import setAssignmentDirectory
 
 
     # =======================================================================
@@ -73,41 +69,25 @@ class AutoGrader3(IAGConstant):
         # private GradingEngine gradingEngine
         console("AutoGraderApp constructor...")
 
-
-        # ---------- AutoGrader options ----------
-        self._ag_config = {}
-
-        # ---------- set the path to the JSON config file ----------
-        self._configFileName = IAGConstant.CONFIG_FILENAME
-
-        #get the user's home directory and set the path to the config file
-        home = str(Path.home())
-        home = home.rstrip('/')  #remove the trailing '/' if it is present
-        self.configFile = home + '/' + self._configFileName
-        console("Config file path = '" + self.configFile + "'")
-
         # ---------- setup app configurations ----------
         self._setupConfiguration()
 
-        # ---------- initialize the grading engine ----------
+        # ---------- instantiate the AGDocument object ----------
         self._agDocument = AGDocument()
 
-        # ---------- initialize other class members ----------
-
-    # =======================================================================
-    # public AGDocument getAgDocument()
-    # =======================================================================
-    #def getAgDocument(self):
-    #    return self._agDocument
+        # ---------- create the LMS interface ----------
+        self._lmsInterface = None   # this is an IAssignmentStore object
+        self._assignment = None     # this is an LMS exchange object (Assignment class)
 
 
+'''
     # =======================================================================
     # public void deSerializeFromDisk(String fileName) throws Exception
     # Callback for File->Open
     # =======================================================================
     def deSerializeFromDisk(fileName):
         console('[AutoGrader3:deSerializeFromDisk() stub]')
-        '''
+
         #De-serialization
         # Reading the object from a file
         FileInputStream file = new FileInputStream(fileName)
@@ -120,7 +100,7 @@ class AutoGrader3(IAGConstant):
         file.close()
 
         console("Grading Engine successfully de-serialized.")
-        '''
+
 
 
     # =======================================================================
@@ -130,7 +110,7 @@ class AutoGrader3(IAGConstant):
     # =======================================================================
     def serializeToDisk (fileName):
         console('[AutoGrader3:serializeToDisk() stub]')
-        '''
+
         # Serialization
         #Saving of object in a file
         FileOutputStream file = new FileOutputStream(fileName)
@@ -143,7 +123,7 @@ class AutoGrader3(IAGConstant):
         file.close()
 
         console("Grading Engine successfully serialized.")
-        '''
+'''
 
 
 

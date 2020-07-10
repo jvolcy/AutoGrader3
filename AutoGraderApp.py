@@ -1,8 +1,6 @@
-from IAGConstant import IAGConstant
 from console import console
 from AutoGrader3 import AutoGrader3
-from Submission import Submission
-from pathlib import Path
+from lms.LmsSimulator import LmsSimulator
 
 autoGrader =  None
 APP_NAME = "Spelman AutoGrader 3"
@@ -19,69 +17,28 @@ def main():
     global autoGrader
     console("main...")
 
-    # instantiate the AutoGrader3 object
+    # 1 instantiate the AutoGrader3 object
     autoGrader = AutoGrader3()
 
+    # 2 instantiate an LMS object
+    simulator = LmsSimulator()
 
-    # 1 set the name of the submission here
-    autoGrader._setAssignmentName("P1005 Test Assignment")
+    # 3 attach LMS object to the autoGrader
+    autoGrader.setLms(simulator)
 
-    # 2 set the list of test data and data files here
+    # 4 set the list of test data and data files here
     autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/CIS 113 - Python I/TestData/P1005/P1005-1.txt')
     autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/CIS 113 - Python I/TestData/P1005/P1005-2.txt')
     autoGrader.addDataFile('/Users/jvolcy/Documents/words.txt')
 
+    # 5 retrieve an assignment from the LMS (for non-simulated LMS, there is likely some LMS configuration that
+    # will need to be done before making this call.
+    autoGrader.getAssignmentFromLms()
 
-    # 3 Add submissions to the AGDocument's grading engine here
-
-    # -----------------------------------------------------------
-    # TEST ASSIGNMENT #1
-    submission = Submission()
-    submission.submissionDirectory = "/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005/Abiodun Scott"
-    submission.submissionFiles.append("P1005.py")
-    submission.language = 'Python 3'
-    submission.studentName = 'Abiodun Scott'
-
-    # add submissions
-    autoGrader.addSubmission(submission)
-
-    # -----------------------------------------------------------
-    # TEST ASSIGNMENT #2
-    submission = Submission()
-    submission.submissionDirectory = "/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005/Adia Haynes"
-    submission.submissionFiles.append("P1005.py")
-    submission.language = 'Python 3'
-    submission.studentName = 'Adia Haynes'
-
-    # add submissions
-    autoGrader.addSubmission(submission)
-
-    # -----------------------------------------------------------
-    # TEST ASSIGNMENT #3
-    submission = Submission()
-    submission.submissionDirectory = "/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005/Amore Daniels"
-    submission.submissionFiles.append("P1005 - Spellchecker.py")
-    submission.language = 'Python 3'
-    submission.studentName = 'Amore Daniels'
-
-    # add submissions
-    autoGrader.addSubmission(submission)
-
-    # -----------------------------------------------------------
-
-    # 4 ---------- Configure the Grading Engine ----------
-    autoGrader.setCppCompiler(autoGrader.getConfiguration(autoGrader.AG_CONFIG.CPP_COMPILER))
-    autoGrader.setPython3Interpreter(autoGrader.getConfiguration(autoGrader.AG_CONFIG.PYTHON3_INTERPRETER))
-    autoGrader.setShellInterpreter(autoGrader.getConfiguration(autoGrader.AG_CONFIG.SHELL))
-    autoGrader.setTempOutputDirectory(str(Path.home()))  #use the home directory as the temp directory
-    autoGrader.setMaxOutputLines(int(autoGrader.getConfiguration(autoGrader.AG_CONFIG.MAX_OUTPUT_LINES)))
-    autoGrader.setMaxRunTime(int(autoGrader.getConfiguration(autoGrader.AG_CONFIG.MAX_RUNTIME)))
-
-
-    # 5 Execute the grading
+    # 6 Execute the grading
     autoGrader.grade()
 
-    # 6 Retrieve the html report
+    # 7 Retrieve the html report
     #htmlReport = agDoc.htmlReport
     #print(">>",htmlReport[:1000], "<<")
 
