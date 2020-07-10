@@ -203,7 +203,7 @@ class GradingEngine(IAGConstant):
             e = sys.exc_info()[0]
             console("__readFromFile(): " + str(e))
 
-        console("__readFromFile(): " + text[:50] + '...')
+        #console("__readFromFile(): " + text[:50] + '...')
         return text
 
 
@@ -518,7 +518,7 @@ class GradingEngine(IAGConstant):
     # is captured in execSubmission().
     # ======================================================================
     def __cppSubProcess(self, submission, numTests, bNoTestFiles):
-        console("cppSubProcess: " + submission.studentName)
+        #console("cppSubProcess: " + submission.studentName)
 
         exeFile = submission.submissionDirectory + "/AG.out"
 
@@ -606,7 +606,7 @@ class GradingEngine(IAGConstant):
                 # here, numTests > 0.  Set bNoTestFiles to false
                 bNoTestFiles = False
 
-        console("bNoTestFilesc = " + str(bNoTestFiles))
+        #console("bNoTestFiles = " + str(bNoTestFiles))
         # create arrays to hold test results
         submission.runtimeErrors = [''] * numTests
         submission.progOutputs = [''] * numTests
@@ -671,7 +671,6 @@ class GradingEngine(IAGConstant):
 
             console("primarySubmissionFile = " + str(submission.primarySubmissionFile))
 
-            #print(self.testDataFiles)
 
             if submission.submissionFiles is not None:           # TEMP*******
                 if len(submission.submissionFiles) == 0:
