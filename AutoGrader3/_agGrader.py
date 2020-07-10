@@ -1,7 +1,8 @@
 from console import console
 import os, sys, time
-from shutil import copy
+from shutil import copy, rmtree
 from pathlib import Path
+from IAGConstant import IAGConstant
 
 # =======================================================================
 # 
@@ -56,48 +57,7 @@ def _cleanupDataFiles(self):
                 console(str(e))
     pass
 
-# ======================================================================
-# breakOutTestFiles()
-# function that returns the list of test files in the listTestData
-# list box.  If any of the files contain multiple test cases, these
-# are separated into as many test cases in the supplied output
-# directory.  Multiple test cases within a single file are separated
-# by a TEST_CASE_SEPARATOR string.
-# ===================================================================== */
-#private ArrayList<File> breakOutTestFiles(File outputDirectory) {
-def breakOutTestFiles(self,  outputDirectory):
-    pass
-    '''
-    {
-ArrayList<File> testFiles = new ArrayList<>();
 
-//go through every file in the listTestData list box
-for (Object s : listTestData.getItems()) {
-    String filename = s.toString();
-
-    //read the content of the test file
-    String content = readFromFile(filename);
-
-    //search for test case separators
-    String[] subCases = content.split(IAGConstant.TEST_CASE_SEPARATOR);
-
-    //if none are found, the length of subCases array will be 1.
-    //In that case, add the test files from the 'ListTestData' to the testFiles list
-    if (subCases.length == 1) {
-        testFiles.add(new File(filename));
-    } else {
-        //create temporary files in the output directory for each sub-case
-        for (int counter = 1; counter <= subCases.length; counter++) {
-            String testDataFileName = outputDirectory.getAbsolutePath() + "/" + fileNameFromPathName(filename) + "-" + counter;
-            writeToFile(testDataFileName, subCases[counter - 1]);
-            testFiles.add(new File(testDataFileName));
-            console("creating sub-test case file " + testDataFileName);
-        }
-    }
-}
-return testFiles;
-}
-'''
 
 # =======================================================================
 # _discoverPrimarySubmissionFile()
@@ -135,6 +95,50 @@ def _updateAutoGraderConfiguration(self):
 
 
 # =======================================================================
+# breakOutTestFiles()
+# function that replaces the list of test files in the gradingEngine.testDataFiles
+# list.  If any of the files contain multiple test cases, these
+# are separated into as many test cases and used to replace the single
+# entry in the gradingEngine.testDataFiles list.  Multiple test cases
+# within a single file are separated by a TEST_CASE_SEPARATOR string.
+# ======================================================================
+def breakOutTestFiles(self, outputDirectory):
+
+    console("breakOutTestFiles directory set to " + outputDirectory)
+
+    #go through every file in the listTestData list box
+    for filename in self._agDocument.gradingEngine.testDataFiles:
+
+        #read the content of the test file
+        with open(filename, 'r') as file:
+            content = file.read()
+
+        #search for test case separators
+        subCases = content.split(IAGConstant.TEST_CASE_SEPARATOR)
+
+        #if none are found, the length of subCases array will be 1.
+        #In that case, leave the the current entry in the _agDocument.gradingEngine.testDataFiles list
+        if len(subCases) == 1:
+            continue
+        else:
+            #remove the top-level test data file
+            self._agDocument.gradingEngine.testDataFiles.remove(filename)
+
+            #create temporary files in the output directory for each sub-case
+            for counter in range(1, len(subCases)+1):
+                testDataFileName = os.path.join( outputDirectory, os.path.basename(filename) + '-' + str(counter) )
+
+
+                # write the sub-case to file
+                with open(testDataFileName, 'w') as file:
+                    file.write(subCases[counter-1])
+
+                # add this to the testFiles list
+                self._agDocument.gradingEngine.testDataFiles.append(testDataFileName)
+                console("creating sub-test case file " + testDataFileName)
+
+
+# =======================================================================
 # grade()
 # =======================================================================
 def grade(self):
@@ -143,19 +147,17 @@ def grade(self):
     # copy data files to each submission directory
     self._prepareDataFiles()
 
-    # ****** TO DO ***********
-    '''        //---------- generate break out test files ----------
-        //first make a directory named ag_data in the moodle directory
-        File testDataDirectory = new File( autoGrader.getAgDocument().moodleDirectory.getAbsolutePath() + "/.ag_data");
-        testDataDirectory.mkdir();
 
-        //now put the break out test files in the ag_data directory
-        autoGrader.getAgDocument().testDataFiles = breakOutTestFiles(testDataDirectory);
-        gradingEngine.testDataFiles = autoGrader.getAgDocument().testDataFiles;
+    # ---------- generate break out test files ----------
+    # create a directory to house the breakout files
+    testOutputDir = os.path.join(os.path.join(self._assignment.assignmentDirectory), "breakout")
+    try:
+        os.mkdir(testOutputDir)
+    except:
+        #the directory may already exist: don't error out
+        pass
 
-    '''
-    self.breakOutTestFiles("")
-
+    self.breakOutTestFiles( testOutputDir )
 
     #attempt to discover the primary submission file for each submission
     for submission in self._agDocument.gradingEngine.submissions:
@@ -174,6 +176,14 @@ def grade(self):
     while status.bRunning == True:
         time.sleep(0.5)
         #print('#')
+
+    # remove breakout sub directory and all its contents
+    try:
+        rmtree(testOutputDir)
+    except:
+        #the directory may not exist: don't error out
+        pass
+
 
     # cleanup data files
     self._cleanupDataFiles()

@@ -15,7 +15,7 @@ def main():
     # 1 instantiate the AutoGrader3 object
     autoGrader = AutoGrader3()
 
-    pythonAssignment = False
+    pythonAssignment = True
 
     if pythonAssignment == True:
         # 2 instantiate an LMS object
@@ -35,8 +35,8 @@ def main():
         autoGrader.addDataFile('/Users/jvolcy/Documents/words.txt')
     else:
         # 2 instantiate an LMS object
-        assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/C1014 Short'
-        #assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/C1014'
+        #assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/C1014 Short'
+        assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/C1014'
         simulator = LmsSimulator(assignmentDirectory, autoGrader.LANGUAGE_CPP)
 
         # 3 attach LMS object to the autoGrader
@@ -46,6 +46,7 @@ def main():
         # THEN, EXECUTE THE GRADING ENGINE
 
         # 4 set the list of test data and data files here
+        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/C1014.txt')
         autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/C1014a.txt')
         autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/C1014b.txt')
         autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/C1014c.txt')
@@ -60,13 +61,13 @@ def main():
     autoGrader.grade()
 
     # 7 Retrieve the html report
-    rg = ReportGenerator("AutoGrader 3.0",
-                         autoGrader._assignment.assignmentDirectory,
-                         autoGrader._assignment.submissions,
-                         autoGrader._agDocument.gradingEngine.testDataFiles)
+    rg = ReportGenerator(title="AutoGrader 3.0",
+                         headerText=autoGrader._assignment.assignmentName + " (" + autoGrader._assignment.assignmentID + ")",
+                         submissions=autoGrader._assignment.submissions,
+                         testDataFiles=autoGrader._agDocument.gradingEngine.testDataFiles)
     rg.generateReport()
     htmlReport = rg.getDocument()
-    rg.writeReportToFile(os.path.join(assignmentDirectory, 'report.html'))
+    rg.writeReportToFile(os.path.join(os.path.dirname(assignmentDirectory), os.path.basename(assignmentDirectory) + '.html'))
 
 
     autoGrader.saveConfiguration()

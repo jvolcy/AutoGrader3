@@ -4,6 +4,7 @@ from IAGConstant import IAGConstant
 from console import console
 from AutoGraderAppInfo import VERSION
 from CodeAnalyzer import CodeAnalyzer
+import time
 
 
 
@@ -101,7 +102,8 @@ class ReportGenerator(IAGConstant):
                 "	<title>" + self.__title + "</title>",
                 "</head>",
                 "<body style=\"background: white; font-family: Helvetica\">",
-                "<h2> Grading Summary<br><font color=\"gray\">" + self.__fileNameFromPathName(self.__headerText) + "</h2>"])
+                "<h2> Grading Summary<br><font color=\"gray\">" + self.__headerText + "</h2>",
+                time.asctime() + "<br>" ])
 
         for submission in self.__submissions:
             grade = "---" if submission.grade is None else submission.grade.toString()
@@ -237,7 +239,9 @@ class ReportGenerator(IAGConstant):
                 "",
                 "<body style=\"background: white; font-family: Helvetica\">",
                 "<form encrypt=\"multipart/form-data\" action=\"\" method=\"POST\">",
-                "<h2>" + self.__fileNameFromPathName(self.__headerText) + "</h2>"])
+                "<h2>" + self.__headerText + "</h2>",
+                time.asctime() + "<br>"
+        ])
 
 
     # =======================================================================
