@@ -1,0 +1,12 @@
+P1005 - spell checker
+
+Expected output for Test File #1:
+
+iOS
+Label
+4-11
+Container
+0
+Add
+2
+button.
