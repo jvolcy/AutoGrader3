@@ -144,7 +144,7 @@ class GradingEngine(IAGConstant):
     # private String readFromFile(String filepath)
     # ======================================================================
     def __blockReadFromFile(self, filepath):
-        console("__blockReadFromFile() " + filepath)
+        #console("__blockReadFromFile() " + filepath)
         self.__bLastReadExceedsMaxLines = False
         try:
             inFile = open(filepath, 'rt')
@@ -170,7 +170,7 @@ class GradingEngine(IAGConstant):
     # set maxLines to 0 to read the entire file.  This is the default.
     # ======================================================================
     def __readFromFile(self, filepath, maxLines = 0):
-        console("__readFromFile() " + filepath)
+        #console("__readFromFile() " + filepath)
 
         self.__bLastReadExceedsMaxLines = False
 
@@ -203,6 +203,7 @@ class GradingEngine(IAGConstant):
             e = sys.exc_info()[0]
             console("__readFromFile(): " + str(e))
 
+        console("__readFromFile(): " + text[:50] + '...')
         return text
 
 
@@ -301,8 +302,7 @@ class GradingEngine(IAGConstant):
 
         #delete any previously compiled exe file in the output directory.
         try:
-            #delete the exe file if it exists, ignoring any "file not found" errors.
-            exeFile.delete()
+            os.remove(exeFile)
         except:
             # ignore errors from the delete operation
             pass
@@ -310,7 +310,7 @@ class GradingEngine(IAGConstant):
 
         #perform the compilation
         console("compiling:" + compile_args)
-        execResult = self.__shellExec(compile_args, timeoutSec, maxOutputLines, os.path.abspath(exeFile), exeFile.getParent())
+        execResult = self.__shellExec(compile_args, timeoutSec, maxOutputLines, os.path.abspath(exeFile), os.path.dirname(exeFile))
 
         return execResult
 
@@ -526,7 +526,7 @@ class GradingEngine(IAGConstant):
         execResult = self.__compileCppFiles(self.__cppCompiler, submission.submissionFiles, exeFile, self.__MAX_COMPILE_TIME_SEC, self.__MAX_COMPILER_OUTPUT_LINES)
         submission.compilerErrors = execResult.output
 
-        if exeFile.isFile():   #did the compilation succeed?
+        if os.path.isfile(exeFile):   #did the compilation succeed?
             console("Compilation succeeded.")
         else:
             console("Compilation Failed.")
@@ -549,9 +549,9 @@ class GradingEngine(IAGConstant):
                 dataFileName = os.path.abspath(self.testDataFiles[i])
                 cmd = "\"" + exeFile + "\" " + " < \"" + dataFileName + "\""
 
-
+            exeFile = os.path.abspath(exeFile)
             # the command string, cmd
-            execResult = self.__shellExec(cmd, self.__maxRunTime, self.__maxOutputLines, os.path.abspath(exeFile), submission.submissionDirectory)
+            execResult = self.__shellExec(cmd, self.__maxRunTime, self.__maxOutputLines, exeFile, submission.submissionDirectory)
 
             # store the output in the submission object
             submission.progOutputs[i] = execResult.output
@@ -569,7 +569,12 @@ class GradingEngine(IAGConstant):
             # store the execution time in the submission object
             submission.executionTimes[i] = execResult.execTimeSec;
 
-
+        # delete the exe file if it exists, ignoring any "file not found" errors.
+        try:
+            os.remove(exeFile)
+        except:
+            # ignore errors from the delete operation
+            pass
 
 
     # =======================================================================
@@ -666,7 +671,7 @@ class GradingEngine(IAGConstant):
 
             console("primarySubmissionFile = " + str(submission.primarySubmissionFile))
 
-            print(self.testDataFiles)
+            #print(self.testDataFiles)
 
             if submission.submissionFiles is not None:           # TEMP*******
                 if len(submission.submissionFiles) == 0:
@@ -717,7 +722,7 @@ def gradingServiceThread(gradingEngine):
         if gradingEngine.bAbortRequest:
             break
 
-    gradingEngine.dumpSubmissions()
+    #gradingEngine.dumpSubmissions()
 
     #indicate that the thread is done.
     gradingEngine.processingStatus.bRunning = False

@@ -15,18 +15,42 @@ def main():
     # 1 instantiate the AutoGrader3 object
     autoGrader = AutoGrader3()
 
-    # 2 instantiate an LMS object
-    #assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005 Short'
-    assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005'
-    simulator = LmsSimulator(assignmentDirectory, autoGrader.LANGUAGE_PYTHON3)
+    pythonAssignment = False
 
-    # 3 attach LMS object to the autoGrader
-    autoGrader.setLms(simulator)
+    if pythonAssignment == True:
+        # 2 instantiate an LMS object
+        #assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005 Short'
+        assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005'
+        simulator = LmsSimulator(assignmentDirectory, autoGrader.LANGUAGE_PYTHON3)
 
-    # 4 set the list of test data and data files here
-    autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/CIS 113 - Python I/TestData/P1005/P1005-1.txt')
-    autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/CIS 113 - Python I/TestData/P1005/P1005-2.txt')
-    autoGrader.addDataFile('/Users/jvolcy/Documents/words.txt')
+        # 3 attach LMS object to the autoGrader
+        autoGrader.setLms(simulator)
+
+        # ** THIS IS WHERE WE GATHER THE INFORMATION NORMALLY GATHERED THROUGH THE GUI.
+        # THEN, EXECUTE THE GRADING ENGINE
+
+        # 4 set the list of test data and data files here
+        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-1.txt')
+        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-2.txt')
+        autoGrader.addDataFile('/Users/jvolcy/Documents/words.txt')
+    else:
+        # 2 instantiate an LMS object
+        assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/C1014 Short'
+        #assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/C1014'
+        simulator = LmsSimulator(assignmentDirectory, autoGrader.LANGUAGE_CPP)
+
+        # 3 attach LMS object to the autoGrader
+        autoGrader.setLms(simulator)
+
+        # ** THIS IS WHERE WE GATHER THE INFORMATION NORMALLY GATHERED THROUGH THE GUI.
+        # THEN, EXECUTE THE GRADING ENGINE
+
+        # 4 set the list of test data and data files here
+        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/C1014a.txt')
+        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/C1014b.txt')
+        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/C1014c.txt')
+
+        #autoGrader.addDataFile('/Users/jvolcy/Documents/words.txt')
 
     # 5 retrieve an assignment from the LMS (for non-simulated LMS, there is likely some LMS configuration that
     # will need to be done before making this call.
@@ -36,21 +60,17 @@ def main():
     autoGrader.grade()
 
     # 7 Retrieve the html report
-    rg = ReportGenerator("AutoGrader 3.0",  autoGrader._assignment.assignmentDirectory , autoGrader._assignment.submissions, autoGrader._agDocument.dataFiles)
+    rg = ReportGenerator("AutoGrader 3.0",
+                         autoGrader._assignment.assignmentDirectory,
+                         autoGrader._assignment.submissions,
+                         autoGrader._agDocument.gradingEngine.testDataFiles)
     rg.generateReport()
     htmlReport = rg.getDocument()
     rg.writeReportToFile(os.path.join(assignmentDirectory, 'report.html'))
 
-    #htmlReport = ReportGenerator.generateAnnotatedReport(autoGrader._agDocument)
-
-    print(htmlReport[:500])
-    #htmlReport = agDoc.htmlReport
-    #print(">>",htmlReport[:1000], "<<")
 
     autoGrader.saveConfiguration()
 
-    # ** THIS IS WHERE WE GATHER THE INFORMATION NORMALLY GATHERED THROUGH THE GUI.
-    # THEN, EXECUTE THE GRADING ENGINE
 
         
     #---------- Commit the AG options to the JSON file ----------

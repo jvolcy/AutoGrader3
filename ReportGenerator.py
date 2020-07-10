@@ -76,13 +76,13 @@ class ReportGenerator(IAGConstant):
         self.__makeHtmlHeader()
 
         for submission in self.__submissions:
-            console('__reportFileAnalytics')
+            #console('__reportFileAnalytics')
             self.__reportFileAnalytics(submission)
-            console('__reportSourceCode')
+            #console('__reportSourceCode')
             self.__reportSourceCode(submission)
-            console('__reportOutputs')
+            #console('__reportOutputs')
             self.__reportOutputs(submission)
-            console('__insertGradingBoxes')
+            #console('__insertGradingBoxes')
             self.__insertGradingBoxes(submission)
 
         self.__reportClosingInfo(self.__submissions)
@@ -415,7 +415,7 @@ class ReportGenerator(IAGConstant):
     # returns a string that is the html-formatted message in a red font
     # ======================================================================
     def __formatErrorMsg(self, errorMessage):
-        return "<font color=\"" + self.__ERROR_COLOR + "\">" + errorMessage + "</font><br>"
+        return "<pre><font color=\"" + self.__ERROR_COLOR + "\">" + errorMessage + "</font></pre><br>"
 
 
     # =======================================================================
