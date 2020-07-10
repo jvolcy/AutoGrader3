@@ -120,7 +120,7 @@ class CodeAnalyzer(object):
 
         except:
             e = sys.exc_info()[0]
-            console("analyzePythonFile(): " + e.toString())
+            console("analyzePythonFile(): " + str(e))
 
         numDocStr /= 2       # assume that docString tokens appear in pairs
 
