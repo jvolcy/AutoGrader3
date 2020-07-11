@@ -4,6 +4,7 @@ from AutoGrader3 import AutoGrader3
 from lms.LmsSimulator import LmsSimulator
 from ReportGenerator import ReportGenerator
 import os
+from IAGConstant import IAGConstant
 
 # =======================================================================
 # public static void main(String[] args)
@@ -66,20 +67,16 @@ def main():
                          submissions=autoGrader._assignment.submissions,
                          testDataFiles=autoGrader._agDocument.gradingEngine.testDataFiles)
     rg.generateReport()
-    htmlReport = rg.getDocument()
+    #htmlReport = rg.getDocument()
     rg.writeReportToFile(os.path.join(os.path.dirname(assignmentDirectory), os.path.basename(assignmentDirectory) + '.html'))
-
 
     autoGrader.saveConfiguration()
 
-
-        
     #---------- Commit the AG options to the JSON file ----------
     # TEMP autoGrader.saveConfiguration()
     console("Exiting main()...")
 
 main()
-
 
 
 

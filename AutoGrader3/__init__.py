@@ -1,6 +1,7 @@
 from IAGConstant import IAGConstant
 from console import console
 from AGDocument import AGDocument
+from MossClient import MossClient
 
 # =======================================================================
 # AutoGrader3 class
@@ -34,13 +35,15 @@ class AutoGrader3(IAGConstant):
     from ._agConfig import saveConfiguration
     from ._agConfig import setConfiguration
 
+    '''
     # Grading Engine configurations
-    from ._agConfig import setCppCompiler
-    from ._agConfig import setPython3Interpreter
-    from ._agConfig import setShellInterpreter
-    from ._agConfig import setTempOutputDirectory
-    from ._agConfig import setMaxOutputLines
-    from ._agConfig import setMaxRunTime
+    from ._agConfig import _setCppCompiler
+    from ._agConfig import _setPython3Interpreter
+    from ._agConfig import _setShellInterpreter
+    from ._agConfig import _setTempOutputDirectory
+    from ._agConfig import _setMaxOutputLines
+    from ._agConfig import _setMaxRunTime
+    '''
 
     # Grading Engine module functions
     from ._agGrader import _updateAutoGraderConfiguration
@@ -54,11 +57,16 @@ class AutoGrader3(IAGConstant):
     from ._agGrader import breakOutTestFiles
     from ._agGrader import grade
 
+    # MOSS
+    from ._agGrader import _runMoss
+    from ._agGrader import _mossThread
+
     # LMS interface functions
     from ._agLmsInterface import setLms
     from ._agLmsInterface import getAssignmentFromLms
     from ._agLmsInterface import submitAssignmentToLms
     from ._agLmsInterface import setAssignmentDirectory
+
 
 
     # =======================================================================
@@ -79,6 +87,10 @@ class AutoGrader3(IAGConstant):
         self._lmsInterface = None   # this is an IAssignmentStore object
         self._assignment = None     # this is an LMS exchange object (Assignment class)
 
+        # ---------- MOSS ----------
+        self._mossClient = MossClient()
+        self._mossUrl = ''          #the URL of the resulting MOSS comparison
+        self._mossThreadHandle = None     #handle the the MOSS thread
 
 '''
     # =======================================================================

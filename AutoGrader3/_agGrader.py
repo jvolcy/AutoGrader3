@@ -3,6 +3,8 @@ import os, sys, time
 from shutil import copy, rmtree
 from pathlib import Path
 from IAGConstant import IAGConstant
+from MossClient import MossClient
+import threading
 
 # =======================================================================
 # 
@@ -36,7 +38,6 @@ def _prepareDataFiles(self):
                 copy(src, dst)
             except:
                 e = sys.exc_info()[0]
-                print(e)
                 console("AGDocument::_prepareDataFiles() " + str(e))
 
 # =======================================================================
@@ -86,13 +87,21 @@ def _discoverPrimarySubmissionFile(self, submission):
 # _updateAutoGraderConfiguration
 # =======================================================================
 def _updateAutoGraderConfiguration(self):
-    self.setCppCompiler(self.getConfiguration(self.AG_CONFIG.CPP_COMPILER))
-    self.setPython3Interpreter(self.getConfiguration(self.AG_CONFIG.PYTHON3_INTERPRETER))
-    self.setShellInterpreter(self.getConfiguration(self.AG_CONFIG.SHELL))
-    self.setTempOutputDirectory(str(Path.home()))  #use the home directory as the temp directory
-    self.setMaxOutputLines(int(self.getConfiguration(self.AG_CONFIG.MAX_OUTPUT_LINES)))
-    self.setMaxRunTime(int(self.getConfiguration(self.AG_CONFIG.MAX_RUNTIME)))
+    self._agDocument.gradingEngine.setCppCompiler(self.getConfiguration(self.AG_CONFIG.CPP_COMPILER))
+    self._agDocument.gradingEngine.setPython3Interpreter(self.getConfiguration(self.AG_CONFIG.PYTHON3_INTERPRETER))
+    self._agDocument.gradingEngine.setShellInterpreter(self.getConfiguration(self.AG_CONFIG.SHELL))
+    self._agDocument.gradingEngine.setTempOutputDirectory(str(Path.home()))
+    self._agDocument.gradingEngine.setMaxOutputLines(int(self.getConfiguration(self.AG_CONFIG.MAX_OUTPUT_LINES)))
+    self._agDocument.gradingEngine.setMaxRunTime(int(self.getConfiguration(self.AG_CONFIG.MAX_RUNTIME)))
 
+    '''
+    self._setCppCompiler(self.getConfiguration(self.AG_CONFIG.CPP_COMPILER))
+    self._setPython3Interpreter(self.getConfiguration(self.AG_CONFIG.PYTHON3_INTERPRETER))
+    self._setShellInterpreter(self.getConfiguration(self.AG_CONFIG.SHELL))
+    self._setTempOutputDirectory(str(Path.home()))  #use the home directory as the temp directory
+    self._setMaxOutputLines(int(self.getConfiguration(self.AG_CONFIG.MAX_OUTPUT_LINES)))
+    self._setMaxRunTime(int(self.getConfiguration(self.AG_CONFIG.MAX_RUNTIME)))
+    '''
 
 # =======================================================================
 # breakOutTestFiles()
@@ -139,6 +148,61 @@ def breakOutTestFiles(self, outputDirectory):
 
 
 # =======================================================================
+# runMoss()
+# =======================================================================
+def _runMoss(self, assignment):
+    # ---------- configure the Moss client ----------
+
+    #set server and port
+    self._mossClient.setServer(self.getConfiguration(self.AG_CONFIG.MOSS_SERVER))
+    self._mossClient.setServerPort(int(self.getConfiguration(self.AG_CONFIG.MOSS_PORT)))
+
+    #set userid
+    self._mossClient.setUserId(self.getConfiguration(self.AG_CONFIG.MOSS_USERID))
+
+    #set m
+    self._mossClient.setIgnoreLimit(int(self.getConfiguration(self.AG_CONFIG.MOSS_MAX_MATCHES)))
+
+    #set n
+    self._mossClient.setNumberOfMatchingFiles(int(self.getConfiguration(self.AG_CONFIG.MOSS_NUM_MATCH_FILES)))
+
+    self._mossClient.setCommentString(self._assignment.assignmentName)
+
+    #set language
+    #assume the language of the first submission is the language for all submissions
+    if assignment.submissions[0].language == IAGConstant.LANGUAGE_PYTHON3:
+        self._mossClient.setLanguage("python")
+    elif assignment.submissions[0].language == IAGConstant.LANGUAGE_CPP:
+        self._mossClient.setLanguage("cc")
+    else:
+        console('Failed to invoke MOSS: Must specify a language.')
+        return ''
+
+    #add base files
+    #self._mossClient.addBaseFile("submission/test_student.py");
+
+    # Add Submission Files
+    for submission in assignment.submissions:
+        for submissionFile in submission.submissionFiles:
+            #console('submissionFile = ' + os.path.join(submission.submissionDirectory, submissionFile))
+            self._mossClient.addFile( os.path.join(submission.submissionDirectory, submissionFile) )
+
+    self._mossUrl = ''
+    self._mossThreadHandle = threading.Thread(target=_mossThread, args=(self,))
+    console("Attempting to launch moss thread...")
+    self._mossThreadHandle.start()
+
+    return
+
+# =======================================================================
+# _mossThread()
+# =======================================================================
+def _mossThread(self):
+    console('Moss thread starting...')
+    self._mossUrl = self._mossClient.send()
+    console('Moss thread ending...')
+
+# =======================================================================
 # grade()
 # =======================================================================
 def grade(self):
@@ -164,6 +228,15 @@ def grade(self):
         self._discoverPrimarySubmissionFile(submission)
 
 
+    # ---------- MOSS ----------
+    # if using MOSS, setup here and start the moss thread
+    bUseMoss = self.getConfiguration(IAGConstant.AG_CONFIG.USE_MOSS) == IAGConstant.YES
+
+    if bUseMoss:
+        self._runMoss(self._assignment)
+    else:
+        console("Moss not enabled.")
+
     # perform grading
     console("Processing submissions...")
     self._agDocument.gradingEngine.processSubmissions()
@@ -173,9 +246,26 @@ def grade(self):
     status = self._agDocument.gradingEngine.getProcessingStatus()
 
     # wait for grading thread to complete
+    console('Waiting for grading thread...')
+    progressStartVal = self._agDocument.gradingEngine.processingStatus.startVal
+    progressEndVal = self._agDocument.gradingEngine.processingStatus.endVal
     while status.bRunning == True:
+        #print('$$$$$', self._agDocument.gradingEngine.processingStatus.progress, progressStartVal, type(progressStartVal), progressEndVal, type(progressEndVal))
+        x = (f"Grading status... {format(100 * self._agDocument.gradingEngine.processingStatus.progress / (progressEndVal - progressStartVal), '.1f')}pct")
+        console(x)
         time.sleep(0.5)
-        #print('#')
+    console('Grading thread ended.')
+
+    if bUseMoss:
+        # wait for MOSS thread to complete
+        console('Waiting for MOSS thread...')
+        while self._mossThreadHandle.isAlive():
+            print('#', end='')
+            time.sleep(0.5)
+
+        console('MOSS thread ended')
+        console('MOSS URL = ' + self._mossUrl)
+
 
     # remove breakout sub directory and all its contents
     try:

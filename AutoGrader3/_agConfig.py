@@ -5,6 +5,7 @@ import json
 from IAGConstant import IAGConstant
 from console import console
 from pathlib import Path
+from MossClient import MossClient
 
 # =======================================================================
 # private String autoLocatePython3Interpreter() {
@@ -39,9 +40,7 @@ def _autoLocatePython3Interpreter(self):
         e = sys.exc_info()[0]
         console("autoLocatePython3Interpreter(): " + str(e))
 
-
     return python3Path
-
 
 
 # =======================================================================
@@ -103,9 +102,7 @@ def _autoLocateShell(self):
         e = sys.exc_info()[0]
         console("autoLocateShell(): " + str(e))
 
-
     return shellPath
-
 
 
 # =======================================================================
@@ -128,6 +125,7 @@ def getConfiguration(self, key):
 def setConfiguration(self,  key, value):
     # console("setting conf. for " + key)
     self._ag_config[key] = value
+
 
 # =======================================================================
 # private void setupConfiguration()
@@ -179,6 +177,12 @@ def _setupConfiguration(self):
     self._ag_config[IAGConstant.AG_CONFIG.PYTHON3_INTERPRETER] = python3Path
     self._ag_config[IAGConstant.AG_CONFIG.CPP_COMPILER] = cppPath
     self._ag_config[IAGConstant.AG_CONFIG.SHELL] = shellPath
+    self._ag_config[IAGConstant.AG_CONFIG.USE_MOSS] = IAGConstant.NO
+    self._ag_config[IAGConstant.AG_CONFIG.MOSS_USERID] = ""
+    self._ag_config[IAGConstant.AG_CONFIG.MOSS_SERVER] = MossClient.getDefaultMossServer()
+    self._ag_config[IAGConstant.AG_CONFIG.MOSS_PORT] = str(MossClient.getDefaultMossPort())
+    self._ag_config[IAGConstant.AG_CONFIG.MOSS_MAX_MATCHES] = "10"  # -m
+    self._ag_config[IAGConstant.AG_CONFIG.MOSS_NUM_MATCH_FILES] = "250" # -n
 
     # ---------- Overwrite the default AG options with data from the JSON file ----------
     self._loadConfiguration()
@@ -219,31 +223,30 @@ def saveConfiguration(self):
     with open(self.configFile, 'w') as json_file:
         json.dump(self._ag_config, json_file)
 
-
-
-
+'''
 # =======================================================================
-# Grading Engine config
+# Grading Engine config.
+# These functions are used by to update the grading engine's grading
+# parameters immediately before executing grade().
 # =======================================================================
-
-def setCppCompiler(self, val):
+def _setCppCompiler(self, val):
     self._agDocument.gradingEngine.setCppCompiler(val)
 
-def setPython3Interpreter(self, val):
+def _setPython3Interpreter(self, val):
     self._agDocument.gradingEngine.setPython3Interpreter(val)
 
-def setShellInterpreter(self, val):
+def _setShellInterpreter(self, val):
     self._agDocument.gradingEngine.setShellInterpreter(val)
 
-def setTempOutputDirectory(self, val):
+def _setTempOutputDirectory(self, val):
     self._agDocument.gradingEngine.setTempOutputDirectory(val)
 
-def setMaxOutputLines(self, val):
+def _setMaxOutputLines(self, val):
     self._agDocument.gradingEngine.setMaxOutputLines(val)
 
-def setMaxRunTime(self, val):
+def _setMaxRunTime(self, val):
     self._agDocument.gradingEngine.setMaxRunTime(val)
-
+'''
 
 # =======================================================================
 # xxx
