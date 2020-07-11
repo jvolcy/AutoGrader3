@@ -223,30 +223,6 @@ def saveConfiguration(self):
     with open(self.configFile, 'w') as json_file:
         json.dump(self._ag_config, json_file)
 
-'''
-# =======================================================================
-# Grading Engine config.
-# These functions are used by to update the grading engine's grading
-# parameters immediately before executing grade().
-# =======================================================================
-def _setCppCompiler(self, val):
-    self._agDocument.gradingEngine.setCppCompiler(val)
-
-def _setPython3Interpreter(self, val):
-    self._agDocument.gradingEngine.setPython3Interpreter(val)
-
-def _setShellInterpreter(self, val):
-    self._agDocument.gradingEngine.setShellInterpreter(val)
-
-def _setTempOutputDirectory(self, val):
-    self._agDocument.gradingEngine.setTempOutputDirectory(val)
-
-def _setMaxOutputLines(self, val):
-    self._agDocument.gradingEngine.setMaxOutputLines(val)
-
-def _setMaxRunTime(self, val):
-    self._agDocument.gradingEngine.setMaxRunTime(val)
-'''
 
 # =======================================================================
 # xxx

@@ -35,16 +35,6 @@ class AutoGrader3(IAGConstant):
     from ._agConfig import saveConfiguration
     from ._agConfig import setConfiguration
 
-    '''
-    # Grading Engine configurations
-    from ._agConfig import _setCppCompiler
-    from ._agConfig import _setPython3Interpreter
-    from ._agConfig import _setShellInterpreter
-    from ._agConfig import _setTempOutputDirectory
-    from ._agConfig import _setMaxOutputLines
-    from ._agConfig import _setMaxRunTime
-    '''
-
     # Grading Engine module functions
     from ._agGrader import _updateAutoGraderConfiguration
     from ._agGrader import _setAssignmentName

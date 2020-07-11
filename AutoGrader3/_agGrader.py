@@ -94,15 +94,6 @@ def _updateAutoGraderConfiguration(self):
     self._agDocument.gradingEngine.setMaxOutputLines(int(self.getConfiguration(self.AG_CONFIG.MAX_OUTPUT_LINES)))
     self._agDocument.gradingEngine.setMaxRunTime(int(self.getConfiguration(self.AG_CONFIG.MAX_RUNTIME)))
 
-    '''
-    self._setCppCompiler(self.getConfiguration(self.AG_CONFIG.CPP_COMPILER))
-    self._setPython3Interpreter(self.getConfiguration(self.AG_CONFIG.PYTHON3_INTERPRETER))
-    self._setShellInterpreter(self.getConfiguration(self.AG_CONFIG.SHELL))
-    self._setTempOutputDirectory(str(Path.home()))  #use the home directory as the temp directory
-    self._setMaxOutputLines(int(self.getConfiguration(self.AG_CONFIG.MAX_OUTPUT_LINES)))
-    self._setMaxRunTime(int(self.getConfiguration(self.AG_CONFIG.MAX_RUNTIME)))
-    '''
-
 # =======================================================================
 # breakOutTestFiles()
 # function that replaces the list of test files in the gradingEngine.testDataFiles
