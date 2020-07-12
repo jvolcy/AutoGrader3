@@ -3,7 +3,7 @@ import os, sys, time
 from shutil import copy, rmtree
 from pathlib import Path
 from IAGConstant import IAGConstant
-from MossClient import MossClient
+#from MossClient import MossClient
 import threading
 
 # =======================================================================
@@ -23,19 +23,21 @@ def addSubmission(self, submission):
 
 # =======================================================================
 # prepareDataFiles()
-# This function copies all data files to the submission directory of
-# every submission
+# This function creates a symbolic link of all data needed files in the
+# submission directory of every submission
 # =======================================================================
 def _prepareDataFiles(self):
-    #---------- copy all data files into each submission directory ----------
+    #---------- symlink all data files into each submission directory ----------
     #go through every data file in the listDataFiles list box
     for src in  self._agDocument.dataFiles:
-        # copy each data file to each of the submission directories
+        # symlink each data file to each of the submission directories
         for submission in self._agDocument.gradingEngine.submissions:
             dst = submission.submissionDirectory + "/" + os.path.basename(src)
             try:
-                console("copying \"" + src + "\" to \"" + dst + "\"")
-                copy(src, dst)
+                #console("copying \"" + src + "\" to \"" + dst + "\"")
+                #copy(src, dst)
+                console("Crearing sybmolic link \"" + dst + "\" --> \"" + src + "\"")
+                os.symlink(src, dst)
             except:
                 e = sys.exc_info()[0]
                 console("AGDocument::_prepareDataFiles() " + str(e))
