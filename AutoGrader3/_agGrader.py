@@ -207,7 +207,8 @@ def grade(self):
 
     # ---------- generate break out test files ----------
     # create a directory to house the breakout files
-    testOutputDir = os.path.join(os.path.join(self._assignment.assignmentDirectory), "breakout")
+    #testOutputDir = os.path.join(os.path.join(self._assignment.assignmentDirectory), "breakout")
+    testOutputDir = os.path.join(os.path.join(self.lms.getWorkingDirectory()), "breakout")
     try:
         os.mkdir(testOutputDir)
     except:

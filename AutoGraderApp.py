@@ -1,10 +1,8 @@
-from AutoGraderAppInfo import *
 from console import console
 from AutoGrader3 import AutoGrader3
 from lms.LmsSimulator import LmsSimulator
 from ReportGenerator import ReportGenerator
 import os
-from IAGConstant import IAGConstant
 
 # =======================================================================
 # public static void main(String[] args)
@@ -22,10 +20,11 @@ def main():
         # 2 instantiate an LMS object
         #assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005 Short'
         assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005'
-        simulator = LmsSimulator(assignmentDirectory, autoGrader.LANGUAGE_PYTHON3)
+        # simulator = LmsSimulator(assignmentDirectory, autoGrader.LANGUAGE_PYTHON3)
+        autoGrader.lms = LmsSimulator(assignmentDirectory, autoGrader.LANGUAGE_PYTHON3)
 
         # 3 attach LMS object to the autoGrader
-        autoGrader.setLms(simulator)
+        # autoGrader.setLms(simulator)
 
         # ** THIS IS WHERE WE GATHER THE INFORMATION NORMALLY GATHERED THROUGH THE GUI.
         # THEN, EXECUTE THE GRADING ENGINE
@@ -38,10 +37,12 @@ def main():
         # 2 instantiate an LMS object
         #assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/C1014 Short'
         assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/C1014'
-        simulator = LmsSimulator(assignmentDirectory, autoGrader.LANGUAGE_CPP)
+        #simulator = LmsSimulator(assignmentDirectory, autoGrader.LANGUAGE_CPP)
+        autoGrader.lsm = LmsSimulator(assignmentDirectory, autoGrader.LANGUAGE_CPP)
 
         # 3 attach LMS object to the autoGrader
-        autoGrader.setLms(simulator)
+        # autoGrader.setLms(simulator)
+        #autoGrader.lms = LmsSimulator(assignmentDirectory, autoGrader.LANGUAGE_CPP)
 
         # ** THIS IS WHERE WE GATHER THE INFORMATION NORMALLY GATHERED THROUGH THE GUI.
         # THEN, EXECUTE THE GRADING ENGINE
@@ -56,15 +57,17 @@ def main():
 
     # 5 retrieve an assignment from the LMS (for non-simulated LMS, there is likely some LMS configuration that
     # will need to be done before making this call.
-    autoGrader.getAssignmentFromLms()
+    autoGrader.lms.getSelectedAssignment()
+    autoGrader._agDocument.assignmentName = autoGrader.lms.getSelectedAssignment().assignmentName
+    autoGrader._agDocument.gradingEngine.submissions = autoGrader.lms.getSelectedAssignment().submissions
 
     # 6 Execute the grading
     autoGrader.grade()
 
     # 7 Retrieve the html report
     rg = ReportGenerator(title="AutoGrader 3.0",
-                         headerText=autoGrader._assignment.assignmentName + " (" + autoGrader._assignment.assignmentID + ")",
-                         submissions=autoGrader._assignment.submissions,
+                         headerText=autoGrader.lms.getSelectedAssignment().assignmentName + " (" + autoGrader.lms.getSelectedAssignment().assignmentID + ")",
+                         submissions=autoGrader.lms.getSelectedAssignment().submissions,
                          testDataFiles=autoGrader._agDocument.gradingEngine.testDataFiles)
     rg.generateReport()
     #htmlReport = rg.getDocument()

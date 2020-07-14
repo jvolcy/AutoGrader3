@@ -52,10 +52,10 @@ class AutoGrader3(IAGConstant):
     from ._agGrader import _mossThread
 
     # LMS interface functions
-    from ._agLmsInterface import setLms
-    from ._agLmsInterface import getAssignmentFromLms
-    from ._agLmsInterface import submitAssignmentToLms
-    from ._agLmsInterface import setAssignmentDirectory
+    #from ._agLmsInterface import setLms
+    #from ._agLmsInterface import getSelectedAssignment
+    #from ._agLmsInterface import submitAssignment
+    #from ._agLmsInterface import setWorkingDirectory
 
 
 
@@ -74,8 +74,8 @@ class AutoGrader3(IAGConstant):
         self._agDocument = AGDocument()
 
         # ---------- create the LMS interface ----------
-        self._lmsInterface = None   # this is an IAssignmentStore object
-        self._assignment = None     # this is an LMS exchange object (Assignment class)
+        #self._lmsInterface = None   # this is an IAssignmentStore object
+        #self._assignment = None     # this is an LMS exchange object (Assignment class)
 
         # ---------- MOSS ----------
         self._mossClient = MossClient()

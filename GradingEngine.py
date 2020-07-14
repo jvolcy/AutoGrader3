@@ -721,7 +721,7 @@ def gradingServiceThread(gradingEngine):
         if gradingEngine.bAbortRequest:
             break
 
-    #gradingEngine.dumpSubmissions()
+    gradingEngine.dumpSubmissions()
 
     #indicate that the thread is done.
     gradingEngine.processingStatus.bRunning = False
