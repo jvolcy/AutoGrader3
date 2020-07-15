@@ -39,12 +39,18 @@ class IAGConstant(object):
         PYTHON3_INTERPRETER = "PYTHON3_INTERPRETER"
         CPP_COMPILER = "CPP_COMPILER"
         SHELL = "SHELL"
+
         USE_MOSS = "USE_MOSS"
         MOSS_USERID = "MOSS_USERID"
         MOSS_SERVER = "MOSS_SERVER"
         MOSS_PORT = "MOSS_PORT"
         MOSS_MAX_MATCHES = "MOSS_MAX_MATCHES"           #-m
         MOSS_NUM_MATCH_FILES = "MOSS_NUM_MATCH_FILES"   #-n
+
+        MOODLE_SERVER = "MOODLE_SERVER"
+        MOODLE_EMAIL = "MOODLE_EMAIL"
+        MOODLE_KEY = "MOODLE_KEY"
+
 
     # ---------- AG Directives ----------
     NAME_DIRECTIVE  =   "@@Name"

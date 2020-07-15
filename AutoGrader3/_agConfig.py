@@ -177,12 +177,17 @@ def _setupConfiguration(self):
     self._ag_config[IAGConstant.AG_CONFIG.PYTHON3_INTERPRETER] = python3Path
     self._ag_config[IAGConstant.AG_CONFIG.CPP_COMPILER] = cppPath
     self._ag_config[IAGConstant.AG_CONFIG.SHELL] = shellPath
+
     self._ag_config[IAGConstant.AG_CONFIG.USE_MOSS] = IAGConstant.NO
     self._ag_config[IAGConstant.AG_CONFIG.MOSS_USERID] = ""
     self._ag_config[IAGConstant.AG_CONFIG.MOSS_SERVER] = MossClient.getDefaultMossServer()
     self._ag_config[IAGConstant.AG_CONFIG.MOSS_PORT] = str(MossClient.getDefaultMossPort())
     self._ag_config[IAGConstant.AG_CONFIG.MOSS_MAX_MATCHES] = "10"  # -m
     self._ag_config[IAGConstant.AG_CONFIG.MOSS_NUM_MATCH_FILES] = "250" # -n
+
+    self._ag_config[IAGConstant.AG_CONFIG.MOODLE_SERVER] = ""
+    self._ag_config[IAGConstant.AG_CONFIG.MOODLE_EMAIL] = ""
+    self._ag_config[IAGConstant.AG_CONFIG.MOODLE_KEY] = ""
 
     # ---------- Overwrite the default AG options with data from the JSON file ----------
     self._loadConfiguration()

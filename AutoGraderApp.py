@@ -1,6 +1,7 @@
 from console import console
 from AutoGrader3 import AutoGrader3
 from lms.LmsSimulator import LmsSimulator
+from lms.Moodle import Moodle
 from ReportGenerator import ReportGenerator
 import os
 
@@ -16,29 +17,51 @@ def main():
 
     # 1 instantiate the AutoGrader3 object
     autoGrader = AutoGrader3()
+    autoGrader.saveConfiguration()
 
     # 2 instantiate an LMS object, specifying the working directory
-    autoGrader.lms = LmsSimulator(workingDirectory)
+    # autoGrader.lms = LmsSimulator(workingDirectory)
+
+    autoGrader.lms = Moodle(server = autoGrader.getConfiguration(autoGrader.AG_CONFIG.MOODLE_SERVER),
+                            securityKey = autoGrader.getConfiguration(autoGrader.AG_CONFIG.MOODLE_KEY),
+                            email = autoGrader.getConfiguration(autoGrader.AG_CONFIG.MOODLE_EMAIL)
+                            )
 
     # 3 fetch the available courses
     courses = autoGrader.lms.getCourses()
     for course in courses:
-        print(course.courseID)
+        print(course)
 
     # 4 select one of the courses.
-    autoGrader.lms.selectCourse(courses[0])
+    autoGrader.lms.selectCourse(courses[8])
 
     # 5 fetch the available assignments for the selected course
     assignments = autoGrader.lms.getAssignments()
     for assignment in assignments:
-        print(autoGrader.lms.getSelectedCourse().courseID, '-->', assignment.assignmentID)
+        #print(autoGrader.lms.getSelectedCourse().courseID, '-->', assignment.assignmentID)
+        print(assignment)
 
     # 6 select one of the assignments.
-    autoGrader.lms.selectAssignment(assignments[1])
+    autoGrader.lms.selectAssignment(assignments[13])
+
+    print('--------------------')
+    print('Selected Course\n', autoGrader.lms.getSelectedCourse())
+    print('--------------------')
+    print('Selected Assignment\n', autoGrader.lms.getSelectedAssignment())
+
+    print('--------------------')
+    print('7 submissions:\n')
+    for i in range(7):
+        print('--------------------')
+        print(autoGrader.lms.getSelectedAssignment().submissions[i])
+        #print(autoGrader.lms.getSelectedAssignment().submissions[i].submissionFiles)
+
 
     # 7 configure the autoGrader
     autoGrader._agDocument.assignmentName = autoGrader.lms.getSelectedAssignment().assignmentName
     autoGrader._agDocument.gradingEngine.submissions = autoGrader.lms.getSelectedAssignment().submissions
+
+    return
 
     # ** THIS IS WHERE WE PUT THE INFORMATION NORMALLY GATHERED THROUGH THE GUI.
     # Warning: This will fail if there are no submissions

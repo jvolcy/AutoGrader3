@@ -1,6 +1,5 @@
 from IAssignmentStore import IAssignmentStore
-from Assignment import Assignment, Course
-from Submission import Submission
+from Assignment import *
 from IAGConstant import IAGConstant
 import os
 from console import console
@@ -25,13 +24,7 @@ class LmsSimulator(IAssignmentStore):
             self.getCourses()
 
         self.__assignments = []
-        self.__assignmentsDirectory = ''
-        self.__selectedAssignment = Assignment()
-
-        self.__selectedAssignment.assignmentDirectory = '' #self.__workingDirectory.rstrip('/')
-        self.__selectedAssignment.assignmentName = '' #os.path.basename(self.__selectedAssignment.assignmentDirectory)
-        self.__selectedAssignment.assignmentID = '' #'000000'
-        self.__selectedAssignment.courseDescription = ''
+        self.__selectedAssignment = None
 
         self.__language = language
         # for the simulation, we immediately call __buildAssignment()
@@ -42,6 +35,12 @@ class LmsSimulator(IAssignmentStore):
     # function to retrieve available courses from the LMS
     # =======================================================================
     def getCourses(self) -> [Course]:
+
+        # the working directory must be set before fetching course information in the simulator.
+        if self.__workingDirectory is None:
+            console('LmsSimulator::getCourses(): Working directory not set.')
+            return None
+
         # for the simulator, courses are in the non-hidden
         # sub-directories of the "courses" directory in the working directory.
         self.__coursesDirectory = os.path.join(self.__workingDirectory, "courses")
@@ -87,15 +86,18 @@ class LmsSimulator(IAssignmentStore):
     # the course must be set before this can be used
     # =======================================================================
     def getAssignments(self) -> [Assignment]:
-        self.__assignmentsDirectory = os.path.join(self.__coursesDirectory, self.__selectedCourse.courseID)
+        assignmentsDirectory = os.path.join(self.__coursesDirectory, self.__selectedCourse.courseID)
 
         # get items in the assignment directory
-        assignmentIDs = os.listdir(self.__assignmentsDirectory)
+        assignmentIDs = os.listdir(assignmentsDirectory)
         for assignmentID in assignmentIDs:
             # get the full path of each item.  If the item is not a directory, ignore it
-            assignment_id_path = os.path.join(self.__assignmentsDirectory, assignmentID)
+            assignment_id_path = os.path.join(assignmentsDirectory, assignmentID)
             if not os.path.isdir(assignment_id_path):
                 continue
+
+            #clear the assignments list
+            self.__assignments.clear()
 
             if not assignmentID.startswith('.'):
                 newAssignment = Assignment()
