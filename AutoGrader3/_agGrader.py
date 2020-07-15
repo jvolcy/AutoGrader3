@@ -3,7 +3,6 @@ import os, sys, time
 from shutil import copy, rmtree
 from pathlib import Path
 from IAGConstant import IAGConstant
-#from MossClient import MossClient
 import threading
 
 # =======================================================================

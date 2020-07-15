@@ -15,6 +15,8 @@ def main():
     autoGrader = AutoGrader3()
     workingDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment'
 
+    pythonAssignment = True
+
     # 2 instantiate an LMS object
     #assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005 Short'
     # simulator = LmsSimulator(assignmentDirectory, autoGrader.LANGUAGE_PYTHON3)
@@ -30,7 +32,7 @@ def main():
     for assignment in assignments:
         print(assignment.assignmentID)
 
-    autoGrader.lms.selectAssignment(assignments[1])
+    autoGrader.lms.selectAssignment(assignments[0])
 
     # 3 attach LMS object to the autoGrader
     # autoGrader.setLms(simulator)
@@ -38,10 +40,20 @@ def main():
     # ** THIS IS WHERE WE GATHER THE INFORMATION NORMALLY GATHERED THROUGH THE GUI.
     # THEN, EXECUTE THE GRADING ENGINE
 
-    # 4 set the list of test data and data files here
-    autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-1.txt')
-    autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-2.txt')
-    autoGrader.addDataFile('/Users/jvolcy/Documents/words.txt')
+    # Warning: This will fail if there are no submissions
+    if autoGrader.lms.getSelectedAssignment().submissions[0].language == autoGrader.LANGUAGE_PYTHON3:
+        # 4 set the list of test data and data files here
+        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-1.txt')
+        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-2.txt')
+        autoGrader.addDataFile('/Users/jvolcy/Documents/words.txt')
+    else:
+        # 4 set the list of test data and data files here
+        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/C1014.txt')
+        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/C1014a.txt')
+        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/C1014b.txt')
+        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/C1014c.txt')
+
+        #autoGrader.addDataFile('/Users/jvolcy/Documents/words.txt')
 
     # 5 retrieve an assignment from the LMS (for non-simulated LMS, there is likely some LMS configuration that
     # will need to be done before making this call.

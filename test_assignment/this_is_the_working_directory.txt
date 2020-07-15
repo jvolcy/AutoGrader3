@@ -1,0 +1,5 @@
+within the working directory
+are the "testData" and "courses" directories (and possibly a "data" directory.
+Within the "courses" directory is a directory for every course.
+Within the individual courses directories and assignment directories.
+Within the assignment directories are the individual student submissions.

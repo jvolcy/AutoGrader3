@@ -59,7 +59,7 @@ class LmsSimulator(IAssignmentStore):
             if not courseID.startswith('.'):
                 newCourse = Course(courseName=courseID + ' Name',
                                     courseID=courseID,
-                                    courseDescription=courseID + 'Description',
+                                    courseDescription=courseID + ' Description',
                                     term=None)
                 self.__courses.append(newCourse)
                 #print(newCourse.courseID)
@@ -99,7 +99,7 @@ class LmsSimulator(IAssignmentStore):
 
             if not assignmentID.startswith('.'):
                 newAssignment = Assignment()
-                newAssignment.assignmentName = assignmentID + 'Name'
+                newAssignment.assignmentName = assignmentID + ' Name'
                 newAssignment.assignmentID = assignmentID
                 newAssignment.assignmentDirectory = assignment_id_path
 
@@ -135,6 +135,7 @@ class LmsSimulator(IAssignmentStore):
 
         # get items in the assignment directory
         studentNames = os.listdir(self.__selectedAssignment.assignmentDirectory)
+        studentNames.sort()
         for studentName in studentNames:
 
             # get the full path of each item.  If the item is not a directory, ignore it
@@ -168,10 +169,14 @@ class LmsSimulator(IAssignmentStore):
                     if file_extension in IAGConstant.PYTHON_EXTENSIONS:
                         self.__language = IAGConstant.LANGUAGE_PYTHON3
                         console("Python auto-detected.")
+                        # language changed: change the language of the current submission
+                        submission.language = self.__language
 
                     if file_extension in IAGConstant.CPP_EXTENSIONS:
                         self.__language = IAGConstant.LANGUAGE_CPP
                         console("C++ auto-detected")
+                        # language changed: change the language of the current submission
+                        submission.language = self.__language
 
                 if self.__language == IAGConstant.LANGUAGE_PYTHON3 and file_extension in IAGConstant.PYTHON_EXTENSIONS:
                     submission.submissionFiles.append(file)
@@ -184,7 +189,7 @@ class LmsSimulator(IAssignmentStore):
             self.__selectedAssignment.submissions.append(submission)
 
         # the __assignments array will have only 1 item
-        self.__assignments = [self.__selectedAssignment]
+        #self.__assignments = [self.__selectedAssignment]
 
 
 
