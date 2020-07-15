@@ -523,50 +523,91 @@ eval(function(p,a,c,k,e,d){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a
 
 <body style="background: white; font-family: Helvetica">
 <form encrypt="multipart/form-data" action="" method="POST">
-<h2>P1005 ShortName (P1005 Short)</h2>
-Tue Jul 14 22:39:20 2020<br><font face="verdana" color="blue"><a id="Student 5"></a>
+<h2>P1005 Short Name (P1005 Short)</h2>
+Wed Jul 15 06:24:01 2020<br><font face="verdana" color="blue"><a id="Student 1"></a>
 <br>
 =======================================================<br>
-Student 5<br>
-P1005-Spellchecker.py<br>
+Student 1<br>
+P1005.py<br>
 =======================================================<br>
-</font></font><br><font face="courier" color="green"><pre>#P1005
-#Spellchecker
-
-
+</font><font face="courier" color="orange">Code Lines: 31<pre style="display:inline;">&#9;</pre><pre style="display:inline;">&#9;</pre>~#Functions:  1<pre style="display:inline;">&#9;</pre><pre style="display:inline;">&#9;</pre>~#Classes: 0<br>
+~#Comments: 11<pre style="display:inline;">&#9;</pre><pre style="display:inline;">&#9;</pre>~#DocStrs: 0.0<br>
+</font><br><font face="courier" color="green"><pre class="brush: python;">#P1005- Spellchecker
 
 def main():
-    #open file
-    inputFile = open('words.txt', 'r')
-    #get user input for a sentence
-    userInput = input('Enter a sentence: ')
-    #create list from input
-    userSplit = userInput.split()
-    #make list for words
-    wordList = []
-    #read through the file
-    for word in inputFile:
-        #strip the \n character off of the words
-        wordStripped = word.rstrip()
-        #add the words to a new file
-        wordList.append(wordStripped)
-    #read user input
-    for words in userSplit:
-        #if the word is in the list then dont do anything
-        if words in wordList:
-            words = ''
-        #print words that are not in the list
+    #create and empty list for the words in the dictionary
+    wordsList = []
+    #open the words text file
+    dictionary = open('words.txt','r')
+
+    #prompt the user for a sentence to spellcheck
+    userInput = input('Write a sentence that you want to spellcheck: ')
+    
+    #make each word in the user's sentence (string) an item in a list
+    splitInput = userInput.split()
+
+    #put each word in the dictionary into a list
+    for word in dictionary:
+        #strip the end character from each word
+        strippedWords = word.rstrip()
+        #add the stripped word into the words list
+        wordsList.append(strippedWords)
+
+    #check to see if each word in the user's list is also in the dictionary
+    for word in splitInput:
+        if word in wordsList:
+            #ignore words that are spelled correctly
+            pass
         else:
-            print(words, 'is spelled incorrectly.')
+            #identify and output every misspelled word in the sentence
+            print(word,'is spelled incorrectly.')
 
 main()
 </pre><font face="courier" color="green"><pre><font color="red"></font></pre><br><font face="verdana" color=" green"><br>
 ------------- /Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-1.txt -------------</font>
-<pre><font face="courier" color="black"></font></pre><pre><font color="red"></font></pre><br><font face="verdana" color="brown">[Execution Time: 0.0000 sec.]</font><br>
+<pre><font face="courier" color="black">Write a sentence that you want to spellcheck: iOS is spelled incorrectly.
+Label is spelled incorrectly.
+4-11 is spelled incorrectly.
+Container is spelled incorrectly.
+0 is spelled incorrectly.
+Add is spelled incorrectly.
+2 is spelled incorrectly.
+button. is spelled incorrectly.
+</font></pre><pre><font color="red"></font></pre><br><font face="verdana" color="brown">[Execution Time: 0.0038 sec.]</font><br>
 <font face="verdana" color=" green"><br>
 ------------- /Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-2.txt -------------</font>
-<pre><font face="courier" color="black"></font></pre><pre><font color="red"></font></pre><br><font face="verdana" color="brown">[Execution Time: 0.0000 sec.]</font><br>
-<font face="courier" color="purple"><br>Instructor Feedback for Student 5</font><br><table><tr><td>Grade <i>(int)</i>:<br><input type="text" id="Student 5 grade" value=0><br><br><br><br></td><td>&nbsp;&nbsp;&nbsp;</td><td>Comment:<br><textarea id="Student 5 comment" rows=4 cols=60></textarea></td></tr></table><font face="verdana" color="blue"><a id="Student 2"></a>
+<pre><font face="courier" color="black">Write a sentence that you want to spellcheck: Your is spelled incorrectly.
+awaits! is spelled incorrectly.
+Move-in is spelled incorrectly.
+2/2 is spelled incorrectly.
+55+ is spelled incorrectly.
+community. is spelled incorrectly.
+Flowing is spelled incorrectly.
+areas. is spelled incorrectly.
+White is spelled incorrectly.
+cabinets, is spelled incorrectly.
+appliances, is spelled incorrectly.
+microwave. is spelled incorrectly.
+Sliding is spelled incorrectly.
+closets. is spelled incorrectly.
+Walk-in is spelled incorrectly.
+bath. is spelled incorrectly.
+Neutral is spelled incorrectly.
+baseboards. is spelled incorrectly.
+Back is spelled incorrectly.
+study, is spelled incorrectly.
+area. is spelled incorrectly.
+Storm is spelled incorrectly.
+protected: is spelled incorrectly.
+ALL is spelled incorrectly.
+IMPACT is spelled incorrectly.
+GLASS is spelled incorrectly.
++ is spelled incorrectly.
+ACCORDION is spelled incorrectly.
+SHUTTERS. is spelled incorrectly.
+Garage is spelled incorrectly.
+</font></pre><pre><font color="red"></font></pre><br><font face="verdana" color="brown">[Execution Time: 0.0061 sec.]</font><br>
+<font face="courier" color="purple"><br>Instructor Feedback for Student 1</font><br><table><tr><td>Grade <i>(int)</i>:<br><input type="text" id="Student 1 grade" value=0><br><br><br><br></td><td>&nbsp;&nbsp;&nbsp;</td><td>Comment:<br><textarea id="Student 1 comment" rows=4 cols=60></textarea></td></tr></table><font face="verdana" color="blue"><a id="Student 2"></a>
 <br>
 =======================================================<br>
 Student 2<br>
@@ -621,7 +662,7 @@ Container
 Add
 2
 button.
-</font></pre><pre><font color="red"></font></pre><br><font face="verdana" color="brown">[Execution Time: 0.2110 sec.]</font><br>
+</font></pre><pre><font color="red"></font></pre><br><font face="verdana" color="brown">[Execution Time: 0.0077 sec.]</font><br>
 <font face="verdana" color=" green"><br>
 ------------- /Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-2.txt -------------</font>
 <pre><font face="courier" color="black">Write a sentence, please: Your
@@ -654,7 +695,7 @@ GLASS
 ACCORDION
 SHUTTERS.
 Garage
-</font></pre><pre><font color="red"></font></pre><br><font face="verdana" color="brown">[Execution Time: 0.2111 sec.]</font><br>
+</font></pre><pre><font color="red"></font></pre><br><font face="verdana" color="brown">[Execution Time: 0.0074 sec.]</font><br>
 <font face="courier" color="purple"><br>Instructor Feedback for Student 2</font><br><table><tr><td>Grade <i>(int)</i>:<br><input type="text" id="Student 2 grade" value=0><br><br><br><br></td><td>&nbsp;&nbsp;&nbsp;</td><td>Comment:<br><textarea id="Student 2 comment" rows=4 cols=60></textarea></td></tr></table><font face="verdana" color="blue"><a id="Student 3"></a>
 <br>
 =======================================================<br>
@@ -691,7 +732,7 @@ main()
     
 </pre><font face="courier" color="green"><pre><font color="red"></font></pre><br><font face="verdana" color=" green"><br>
 ------------- /Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-1.txt -------------</font>
-<pre><font face="courier" color="black">Enter a sentence: ['the', 'final', 'step', 'is', 'to', 'add', 'some', 'layout', 'constraints', 'to', 'ensure', 'that', 'the', 'label', 'remains', 'centered', 'within', 'the', 'containing', 'view', 'regardless', 'of', 'the', 'size', 'of', 'screen', 'on', 'which', 'the', 'application', 'ultimately', 'runs', 'this', 'involves', 'the', 'use', 'of', 'the', 'auto', 'layout', 'capabilities', 'of', 'iOS', 'a', 'topic', 'which', 'will', 'be', 'covered', 'extensively', 'in', 'later', 'chapters', 'for', 'this', 'example', 'simply', 'select', 'the', 'Label', 'object', 'display', 'the', 'align', 'menu', 'as', 'shown', 'in', 'figure', '4-11', 'and', 'enable', 'both', 'the', 'horizontally', 'in', 'Container', 'and', 'vertically', 'in', 'container', 'options', 'with', 'offsets', 'of', '0', 'before', 'clicking', 'on', 'the', 'Add', '2', 'constraints', 'button.']
+<pre><font face="courier" color="black">Enter a sentence: ['the', 'final', 'step', 'is', 'to', 'add', 'some', 'layout', 'constraints', 'to', 'ensure', 'that', 'the', 'label', 'remains', 'centered', 'within', 'the', 'containing', 'view', 're...
 misspelled word(s):  the
 misspelled word(s):  final
 misspelled word(s):  step
@@ -741,12 +782,11 @@ misspelled word(s):  which
 misspelled word(s):  will
 misspelled word(s):  be
 misspelled word(s):  covered
-misspelled word(s):  extensively
 </font></pre><pre><font color="red">Maximum lines of output (50) exceeded.  Output truncated.
-</font></pre><br><font face="verdana" color="brown">[Execution Time: 0.0049 sec.]</font><br>
+</font></pre><br><font face="verdana" color="brown">[Execution Time: 0.0062 sec.]</font><br>
 <font face="verdana" color=" green"><br>
 ------------- /Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-2.txt -------------</font>
-<pre><font face="courier" color="black">Enter a sentence: ['Your', 'future', 'home', 'awaits!', 'Move-in', 'ready', '2/2', 'single', 'family', 'home', 'in', 'quiet', '55+', 'community.', 'Flowing', 'natural', 'light', 'in', 'front', 'and', 'back', 'living', 'areas.', 'White', 'cabinets,', 'gently', 'used', 'appliances,', 'and', 'brand', 'new', 'microwave.', 'Sliding', 'doors', 'in', 'both', 'bedroom', 'closets.', 'Walk-in', 'shower', 'in', 'master', 'bath', 'and', 'tub', 'in', 'second', 'bath.', 'Neutral', 'colors', 'throughout', 'and', 'freshly', 'painted', 'baseboards.', 'Back', 'living', 'area', 'perfect', 'for', 'office', 'or', 'study,', 'leading', 'to', 'patio', 'with', 'space', 'for', 'relaxing', 'seating', 'area.', 'Storm', 'protected:', 'ALL', 'IMPACT', 'GLASS', '+', 'ACCORDION', 'SHUTTERS.', 'Garage', 'with', 'attic']
+<pre><font face="courier" color="black">Enter a sentence: ['Your', 'future', 'home', 'awaits!', 'Move-in', 'ready', '2/2', 'single', 'family', 'home', 'in', 'quiet', '55+', 'community.', 'Flowing', 'natural', 'light', 'in', 'front', 'and', ...
 misspelled word(s):  Your
 misspelled word(s):  future
 misspelled word(s):  home
@@ -796,9 +836,8 @@ misspelled word(s):  in
 misspelled word(s):  second
 misspelled word(s):  bath.
 misspelled word(s):  Neutral
-misspelled word(s):  colors
 </font></pre><pre><font color="red">Maximum lines of output (50) exceeded.  Output truncated.
-</font></pre><br><font face="verdana" color="brown">[Execution Time: 0.0081 sec.]</font><br>
+</font></pre><br><font face="verdana" color="brown">[Execution Time: 0.0074 sec.]</font><br>
 <font face="courier" color="purple"><br>Instructor Feedback for Student 3</font><br><table><tr><td>Grade <i>(int)</i>:<br><input type="text" id="Student 3 grade" value=0><br><br><br><br></td><td>&nbsp;&nbsp;&nbsp;</td><td>Comment:<br><textarea id="Student 3 comment" rows=4 cols=60></textarea></td></tr></table><font face="verdana" color="blue"><a id="Student 4"></a>
 <br>
 =======================================================<br>
@@ -847,54 +886,53 @@ main()
 ------------- /Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-1.txt -------------</font>
 <pre><font face="courier" color="black">Write a sentence:iOS
 This word is spelled incorrectly
-</font></pre><pre><font color="red"></font></pre><br><font face="verdana" color="brown">[Execution Time: 0.2109 sec.]</font><br>
+</font></pre><pre><font color="red"></font></pre><br><font face="verdana" color="brown">[Execution Time: 0.0058 sec.]</font><br>
 <font face="verdana" color=" green"><br>
 ------------- /Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-2.txt -------------</font>
 <pre><font face="courier" color="black">Write a sentence:Your
 This word is spelled incorrectly
-</font></pre><pre><font color="red"></font></pre><br><font face="verdana" color="brown">[Execution Time: 0.0050 sec.]</font><br>
-<font face="courier" color="purple"><br>Instructor Feedback for Student 4</font><br><table><tr><td>Grade <i>(int)</i>:<br><input type="text" id="Student 4 grade" value=0><br><br><br><br></td><td>&nbsp;&nbsp;&nbsp;</td><td>Comment:<br><textarea id="Student 4 comment" rows=4 cols=60></textarea></td></tr></table><font face="verdana" color="blue"><a id="Student 1"></a>
+</font></pre><pre><font color="red"></font></pre><br><font face="verdana" color="brown">[Execution Time: 0.0056 sec.]</font><br>
+<font face="courier" color="purple"><br>Instructor Feedback for Student 4</font><br><table><tr><td>Grade <i>(int)</i>:<br><input type="text" id="Student 4 grade" value=0><br><br><br><br></td><td>&nbsp;&nbsp;&nbsp;</td><td>Comment:<br><textarea id="Student 4 comment" rows=4 cols=60></textarea></td></tr></table><font face="verdana" color="blue"><a id="Student 5"></a>
 <br>
 =======================================================<br>
-Student 1<br>
-P1005.py<br>
+Student 5<br>
+P1005-Spellchecker.py<br>
 =======================================================<br>
-</font><font face="courier" color="orange">Code Lines: 31<pre style="display:inline;">&#9;</pre><pre style="display:inline;">&#9;</pre>~#Functions:  1<pre style="display:inline;">&#9;</pre><pre style="display:inline;">&#9;</pre>~#Classes: 0<br>
-~#Comments: 11<pre style="display:inline;">&#9;</pre><pre style="display:inline;">&#9;</pre>~#DocStrs: 0.0<br>
-</font><br><font face="courier" color="green"><pre class="brush: python;">#P1005- Spellchecker
+</font><font face="courier" color="orange">Code Lines: 30<pre style="display:inline;">&#9;</pre><pre style="display:inline;">&#9;</pre>~#Functions:  1<pre style="display:inline;">&#9;</pre><pre style="display:inline;">&#9;</pre>~#Classes: 0<br>
+~#Comments: 12<pre style="display:inline;">&#9;</pre><pre style="display:inline;">&#9;</pre>~#DocStrs: 0.0<br>
+</font><br><font face="courier" color="green"><pre class="brush: python;">#P1005
+#Spellchecker
+
+
 
 def main():
-    #create and empty list for the words in the dictionary
-    wordsList = []
-    #open the words text file
-    dictionary = open('words.txt','r')
-
-    #prompt the user for a sentence to spellcheck
-    userInput = input('Write a sentence that you want to spellcheck: ')
-    
-    #make each word in the user's sentence (string) an item in a list
-    splitInput = userInput.split()
-
-    #put each word in the dictionary into a list
-    for word in dictionary:
-        #strip the end character from each word
-        strippedWords = word.rstrip()
-        #add the stripped word into the words list
-        wordsList.append(strippedWords)
-
-    #check to see if each word in the user's list is also in the dictionary
-    for word in splitInput:
-        if word in wordsList:
-            #ignore words that are spelled correctly
-            pass
+    #open file
+    inputFile = open('words.txt', 'r')
+    #get user input for a sentence
+    userInput = input('Enter a sentence: ')
+    #create list from input
+    userSplit = userInput.split()
+    #make list for words
+    wordList = []
+    #read through the file
+    for word in inputFile:
+        #strip the \n character off of the words
+        wordStripped = word.rstrip()
+        #add the words to a new file
+        wordList.append(wordStripped)
+    #read user input
+    for words in userSplit:
+        #if the word is in the list then dont do anything
+        if words in wordList:
+            words = ''
+        #print words that are not in the list
         else:
-            #identify and output every misspelled word in the sentence
-            print(word,'is spelled incorrectly.')
+            print(words, 'is spelled incorrectly.')
 
 main()
 </pre><font face="courier" color="green"><pre><font color="red"></font></pre><br><font face="verdana" color=" green"><br>
 ------------- /Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-1.txt -------------</font>
-<pre><font face="courier" color="black">Write a sentence that you want to spellcheck: iOS is spelled incorrectly.
+<pre><font face="courier" color="black">Enter a sentence: iOS is spelled incorrectly.
 Label is spelled incorrectly.
 4-11 is spelled incorrectly.
 Container is spelled incorrectly.
@@ -902,10 +940,10 @@ Container is spelled incorrectly.
 Add is spelled incorrectly.
 2 is spelled incorrectly.
 button. is spelled incorrectly.
-</font></pre><pre><font color="red"></font></pre><br><font face="verdana" color="brown">[Execution Time: 0.0043 sec.]</font><br>
+</font></pre><pre><font color="red"></font></pre><br><font face="verdana" color="brown">[Execution Time: 0.0059 sec.]</font><br>
 <font face="verdana" color=" green"><br>
 ------------- /Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-2.txt -------------</font>
-<pre><font face="courier" color="black">Write a sentence that you want to spellcheck: Your is spelled incorrectly.
+<pre><font face="courier" color="black">Enter a sentence: Your is spelled incorrectly.
 awaits! is spelled incorrectly.
 Move-in is spelled incorrectly.
 2/2 is spelled incorrectly.
@@ -935,5 +973,5 @@ GLASS is spelled incorrectly.
 ACCORDION is spelled incorrectly.
 SHUTTERS. is spelled incorrectly.
 Garage is spelled incorrectly.
-</font></pre><pre><font color="red"></font></pre><br><font face="verdana" color="brown">[Execution Time: 0.2144 sec.]</font><br>
-<font face="courier" color="purple"><br>Instructor Feedback for Student 1</font><br><table><tr><td>Grade <i>(int)</i>:<br><input type="text" id="Student 1 grade" value=0><br><br><br><br></td><td>&nbsp;&nbsp;&nbsp;</td><td>Comment:<br><textarea id="Student 1 comment" rows=4 cols=60></textarea></td></tr></table><pre><font color="red"><br><br><b>**** 5 submission(s) processed. ****</b><br><font face="verdana">Report Generator: AutoGrader pre 3.0.0<br></font></pre><br></form></body></html>
+</font></pre><pre><font color="red"></font></pre><br><font face="verdana" color="brown">[Execution Time: 0.0077 sec.]</font><br>
+<font face="courier" color="purple"><br>Instructor Feedback for Student 5</font><br><table><tr><td>Grade <i>(int)</i>:<br><input type="text" id="Student 5 grade" value=0><br><br><br><br></td><td>&nbsp;&nbsp;&nbsp;</td><td>Comment:<br><textarea id="Student 5 comment" rows=4 cols=60></textarea></td></tr></table><pre><font color="red"><br><br><b>**** 5 submission(s) processed. ****</b><br><font face="verdana">Report Generator: AutoGrader pre 3.0.0<br></font></pre><br></form></body></html>

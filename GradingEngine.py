@@ -168,8 +168,10 @@ class GradingEngine(IAGConstant):
     # =======================================================================
     # private String readFromFile(String filepath, int maxLines)
     # set maxLines to 0 to read the entire file.  This is the default.
+    # Also, for maxLines > 0, limit the length of each line to maxCharsPerLine.
+    # (this avoids large output files due to ridiculously long lines)
     # ======================================================================
-    def __readFromFile(self, filepath, maxLines = 0):
+    def __readFromFile(self, filepath, maxLines = 0, maxCharsPerLine = 200):
         #console("__readFromFile() " + filepath)
 
         self.__bLastReadExceedsMaxLines = False
@@ -189,12 +191,19 @@ class GradingEngine(IAGConstant):
 
             #read the file line by-line until we are out of lines or have
             #reached the max allowed
-            readLine = b.readline()      #individual lines in the file
-            text = readLine
+            readLine = 'x'     #individual lines in the file
             while readLine !='' and numLines < maxLines:
                 readLine = b.readline()
-                text += readLine
-                numLines += 1
+                if readLine == '':
+                    #do nothing.  We are at the end of the file
+                    pass
+                elif len(readLine) > maxCharsPerLine:
+                    #truncate the line
+                    text += readLine[:maxCharsPerLine] + '...\n' # limit the line length
+                    numLines += 1
+                else:
+                    text += readLine
+                    numLines += 1
 
             if numLines == maxLines:
                 self.__bLastReadExceedsMaxLines = True
@@ -353,44 +362,6 @@ class GradingEngine(IAGConstant):
         console("Executing " + args + "\n  as  " + cmdStr)
 
         try:
-            '''
-            #attempt to execute the command
-            elpasedTime = System.currentTimeMillis();
-
-            Process p;
-            p = Runtime.getRuntime().exec(cmd, null, new File(workingDirectory));
-
-            #wait no more than the specified timeout for the process to complete.
-            #a timeout of zero means wait indefinitely.
-
-            if (timeout_sec > 0)
-                p.waitFor(timeout_sec, TimeUnit.SECONDS)
-            else
-                p.waitFor()
-
-            elpasedTime = System.currentTimeMillis() - elpasedTime
-            execResult.execTimeSec = elpasedTime/1000.0
-
-            #check if the process is still alive.  If it is, set the timeout
-            #flag and attempt to forcefully terminate it.
-            if (p.isAlive()):
-                #attempt to detect the PIDs of the launched shell and command
-                pids = self.__getPidFromToken(identifyingToken)
-
-                execResult.bTimedOut = True
-                console ("Killing process " + p.toString() + ". Run time exceeds max value of " + maxRunTime + " seconds.");
-
-                #attempt to destroy the process using the Java supplied methods
-                p.destroy();
-                p.destroyForcibly();
-
-                #force the issue by killing all identified processes with
-                #a unix kill command
-                for pid in pids:
-                    killCmd = "kill -9 " + str(pid)
-                    console(killCmd);
-                    Runtime.getRuntime().exec(killCmd)
-                '''
             start_time = time.time()
             p = subprocess.Popen(args=cmdStr, shell=True,
                                  cwd=workingDirectory)  # the pid returned appears to be the pid of the shell
@@ -430,7 +401,7 @@ class GradingEngine(IAGConstant):
                         timeout_sec))
 
             # copy the first maxOutputLines from the temp file to the output file
-            # Also, limit the # bytes to 40*maxOutputLines (this avoids large output files due to ridiculously long lines)
+            # Also, limit the # bytes to 100*maxOutputLines (this avoids large output files due to ridiculously long lines)
             # self._fileHead(tmpFile, outputFile, maxOutputLines, 40*maxOutputLines)
             # self._removeFile(tmpFile)
 
