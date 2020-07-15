@@ -51,13 +51,6 @@ class AutoGrader3(IAGConstant):
     from ._agGrader import _runMoss
     from ._agGrader import _mossThread
 
-    # LMS interface functions
-    #from ._agLmsInterface import setLms
-    #from ._agLmsInterface import getSelectedAssignment
-    #from ._agLmsInterface import submitAssignment
-    #from ._agLmsInterface import setWorkingDirectory
-
-
 
     # =======================================================================
     # AutoGraderApp()

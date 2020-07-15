@@ -13,51 +13,39 @@ def main():
 
     # 1 instantiate the AutoGrader3 object
     autoGrader = AutoGrader3()
+    workingDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment'
 
-    pythonAssignment = True
+    # 2 instantiate an LMS object
+    #assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005 Short'
+    # simulator = LmsSimulator(assignmentDirectory, autoGrader.LANGUAGE_PYTHON3)
+    autoGrader.lms = LmsSimulator(workingDirectory)
 
-    if pythonAssignment == True:
-        # 2 instantiate an LMS object
-        #assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005 Short'
-        assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/P1005'
-        # simulator = LmsSimulator(assignmentDirectory, autoGrader.LANGUAGE_PYTHON3)
-        autoGrader.lms = LmsSimulator(assignmentDirectory, autoGrader.LANGUAGE_PYTHON3)
+    courses = autoGrader.lms.getCourses()
+    for course in courses:
+        print(course.courseID)
 
-        # 3 attach LMS object to the autoGrader
-        # autoGrader.setLms(simulator)
+    autoGrader.lms.selectCourse(courses[1])
 
-        # ** THIS IS WHERE WE GATHER THE INFORMATION NORMALLY GATHERED THROUGH THE GUI.
-        # THEN, EXECUTE THE GRADING ENGINE
+    assignments = autoGrader.lms.getAssignments()
+    for assignment in assignments:
+        print(assignment.assignmentID)
 
-        # 4 set the list of test data and data files here
-        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-1.txt')
-        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-2.txt')
-        autoGrader.addDataFile('/Users/jvolcy/Documents/words.txt')
-    else:
-        # 2 instantiate an LMS object
-        #assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/C1014 Short'
-        assignmentDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/C1014'
-        #simulator = LmsSimulator(assignmentDirectory, autoGrader.LANGUAGE_CPP)
-        autoGrader.lsm = LmsSimulator(assignmentDirectory, autoGrader.LANGUAGE_CPP)
+    autoGrader.lms.selectAssignment(assignments[1])
 
-        # 3 attach LMS object to the autoGrader
-        # autoGrader.setLms(simulator)
-        #autoGrader.lms = LmsSimulator(assignmentDirectory, autoGrader.LANGUAGE_CPP)
+    # 3 attach LMS object to the autoGrader
+    # autoGrader.setLms(simulator)
 
-        # ** THIS IS WHERE WE GATHER THE INFORMATION NORMALLY GATHERED THROUGH THE GUI.
-        # THEN, EXECUTE THE GRADING ENGINE
+    # ** THIS IS WHERE WE GATHER THE INFORMATION NORMALLY GATHERED THROUGH THE GUI.
+    # THEN, EXECUTE THE GRADING ENGINE
 
-        # 4 set the list of test data and data files here
-        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/C1014.txt')
-        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/C1014a.txt')
-        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/C1014b.txt')
-        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/C1014c.txt')
-
-        #autoGrader.addDataFile('/Users/jvolcy/Documents/words.txt')
+    # 4 set the list of test data and data files here
+    autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-1.txt')
+    autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-2.txt')
+    autoGrader.addDataFile('/Users/jvolcy/Documents/words.txt')
 
     # 5 retrieve an assignment from the LMS (for non-simulated LMS, there is likely some LMS configuration that
     # will need to be done before making this call.
-    autoGrader.lms.getSelectedAssignment()
+    #autoGrader.lms.getSelectedAssignment()
     autoGrader._agDocument.assignmentName = autoGrader.lms.getSelectedAssignment().assignmentName
     autoGrader._agDocument.gradingEngine.submissions = autoGrader.lms.getSelectedAssignment().submissions
 
@@ -71,6 +59,8 @@ def main():
                          testDataFiles=autoGrader._agDocument.gradingEngine.testDataFiles)
     rg.generateReport()
     #htmlReport = rg.getDocument()
+
+    assignmentDirectory = os.path.join(workingDirectory, 'courses', autoGrader.lms.getSelectedCourse().courseID, autoGrader.lms.getSelectedAssignment().assignmentID)
     rg.writeReportToFile(os.path.join(os.path.dirname(assignmentDirectory), os.path.basename(assignmentDirectory) + '.html'))
 
     autoGrader.saveConfiguration()
