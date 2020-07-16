@@ -35,7 +35,7 @@ def main():
         print(course)
 
     # 4 select one of the courses.
-    autoGrader.lms.selectCourse(courses[8])  #8
+    autoGrader.lms.selectCourse(courses[0])  #8
 
     # 5 fetch the available assignments for the selected course
     assignments = autoGrader.lms.getAssignments()
@@ -44,7 +44,7 @@ def main():
         print(assignment)
 
     # 6 select one of the assignments.
-    autoGrader.lms.selectAssignment(assignments[13])  #13
+    autoGrader.lms.selectAssignment(assignments[0])  #13
 
     print('--------------------')
     print('Selected Course\n', autoGrader.lms.getSelectedCourse())
