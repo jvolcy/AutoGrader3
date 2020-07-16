@@ -489,7 +489,7 @@ class GradingEngine(IAGConstant):
     # is captured in execSubmission().
     # ======================================================================
     def __cppSubProcess(self, submission, numTests, bNoTestFiles):
-        #console("cppSubProcess: " + submission.studentName)
+        #console("cppSubProcess: " + submission.participant.name)
 
         exeFile = submission.submissionDirectory + "/AG.out"
 
@@ -632,7 +632,7 @@ class GradingEngine(IAGConstant):
 
         for submission in self.submissions:
             console("------------------------------------------")
-            console("studentName = " + submission.studentName)
+            console("studentName = " + submission.participant.name)
             console("submissionDirectory = " + submission.submissionDirectory)
             console("language = " + submission.language)
 
@@ -683,8 +683,8 @@ def gradingServiceThread(gradingEngine):
     #gradingEngine.dumpSubmissions()
 
     for submission in gradingEngine.submissions:
-        console("Processing " + submission.studentName)
-        gradingEngine.processingStatus.message = submission.studentName
+        console("Processing " + submission.participant.name)
+        gradingEngine.processingStatus.message = submission.participant.name
         gradingEngine.execSubmission(submission)
         gradingEngine.processingStatus.progress += 1
 

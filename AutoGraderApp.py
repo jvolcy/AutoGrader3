@@ -20,12 +20,13 @@ def main():
     autoGrader.saveConfiguration()
 
     # 2 instantiate an LMS object, specifying the working directory
-    # autoGrader.lms = LmsSimulator(workingDirectory)
+    autoGrader.lms = LmsSimulator(workingDirectory)
 
-    autoGrader.lms = Moodle(server = autoGrader.getConfiguration(autoGrader.AG_CONFIG.MOODLE_SERVER),
+    '''autoGrader.lms = Moodle(server = autoGrader.getConfiguration(autoGrader.AG_CONFIG.MOODLE_SERVER),
                             securityKey = autoGrader.getConfiguration(autoGrader.AG_CONFIG.MOODLE_KEY),
                             email = autoGrader.getConfiguration(autoGrader.AG_CONFIG.MOODLE_EMAIL)
                             )
+    '''
     autoGrader.lms.setWorkingDirectory(workingDirectory)
 
     # 3 fetch the available courses
@@ -34,7 +35,7 @@ def main():
         print(course)
 
     # 4 select one of the courses.
-    autoGrader.lms.selectCourse(courses[8])
+    autoGrader.lms.selectCourse(courses[8])  #8
 
     # 5 fetch the available assignments for the selected course
     assignments = autoGrader.lms.getAssignments()
@@ -43,7 +44,7 @@ def main():
         print(assignment)
 
     # 6 select one of the assignments.
-    autoGrader.lms.selectAssignment(assignments[13])
+    autoGrader.lms.selectAssignment(assignments[13])  #13
 
     print('--------------------')
     print('Selected Course\n', autoGrader.lms.getSelectedCourse())
@@ -57,7 +58,7 @@ def main():
     autoGrader._agDocument.assignmentName = autoGrader.lms.getSelectedAssignment().assignmentName
     autoGrader._agDocument.gradingEngine.submissions = autoGrader.lms.getSelectedAssignment().submissions
 
-    return
+
     '''for i in range(7):
         print('--------------------')
         print(autoGrader.lms.getSelectedAssignment().submissions[i])'''
@@ -99,8 +100,10 @@ def main():
     rg.generateReport()
 
     assignmentDirectory = os.path.join(workingDirectory, 'courses', str(autoGrader.lms.getSelectedCourse().courseID), str(autoGrader.lms.getSelectedAssignment().assignmentID))
-    rg.writeReportToFile(os.path.join(os.path.dirname(assignmentDirectory), os.path.basename(assignmentDirectory) + '.html'))
+    outputFile = os.path.join(os.path.dirname(assignmentDirectory), os.path.basename(assignmentDirectory) + '.html')
+    rg.writeReportToFile(outputFile)
 
+    console('Report Generator output: file://' + outputFile)
     # 10 save AG config options
     autoGrader.saveConfiguration()
 

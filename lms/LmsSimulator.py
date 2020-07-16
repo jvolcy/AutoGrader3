@@ -88,6 +88,9 @@ class LmsSimulator(IAssignmentStore):
     def getAssignments(self) -> [Assignment]:
         assignmentsDirectory = os.path.join(self.__coursesDirectory, self.__selectedCourse.courseID)
 
+        # clear the assignments list
+        self.__assignments.clear()
+
         # get items in the assignment directory
         assignmentIDs = os.listdir(assignmentsDirectory)
         for assignmentID in assignmentIDs:
@@ -95,9 +98,6 @@ class LmsSimulator(IAssignmentStore):
             assignment_id_path = os.path.join(assignmentsDirectory, assignmentID)
             if not os.path.isdir(assignment_id_path):
                 continue
-
-            #clear the assignments list
-            self.__assignments.clear()
 
             if not assignmentID.startswith('.'):
                 newAssignment = Assignment()
@@ -154,7 +154,12 @@ class LmsSimulator(IAssignmentStore):
             submission = Submission()
             submission.submissionDirectory = submissionDirectory
             submission.language = self.__language
-            submission.studentName = studentName
+            #submission.studentName = studentName
+            submission.participant = Participant(lmsID = 123456,
+                                                 name = studentName,
+                                                 schoolID = "900XXXXXX",
+                                                 email = "jane.doe@scmail.spelman.edu",
+                                                 role = "Student")
 
             # find all programming files in the subdirectory
             files = os.listdir(submission.submissionDirectory)
@@ -194,6 +199,13 @@ class LmsSimulator(IAssignmentStore):
         #self.__assignments = [self.__selectedAssignment]
 
 
+    # =======================================================================
+    # function that downloads all submissions to disk following the convention
+    # course->assignment->[submissions]
+    # =======================================================================
+    def downloadSubmissions(self):
+        # nothing to do here
+        pass
 
     # =======================================================================
     # function to submit graded assignments back to the LMS

@@ -51,7 +51,8 @@ class Submission(object):
     def __init__(self):
         # ---------- general members ----------
         self.submissionID = None
-        self.studentName = ''
+        #self.studentName = ''
+        self.participant = Participant()
         self.submissionDirectory = ''
         self.submissionFiles = []  # array of file names
         self.primarySubmissionFile = None  # file name
@@ -80,7 +81,7 @@ class Submission(object):
         self.dataDirective = ''        # misc. data
 
     def __str__(self):
-        return f'Submission ID: {self.submissionID}\nStudent Name: {self.studentName}\n\
+        return f'Submission ID: {self.submissionID}\nStudent Name: {self.participant.name}\n\
 Submission Directory: {self.submissionDirectory}\n{len(self.submissionFiles)} Submitted File(s): {self.submissionFiles}'
 
 

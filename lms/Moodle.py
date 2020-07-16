@@ -24,7 +24,7 @@ class Moodle(IAssignmentStore):
 
         self.__courses = []
         self.__selectedCourse = None    #Course()
-        self.__participants = []        #individuals enrolled in the course (students, faculty, TAs, etc.)
+        self.__participants = {}        #dictionary of individuals enrolled in the course (students, faculty, TAs, etc.).  key is lms userid.
 
         self.__assignments = []
         self.__selectedAssignment = None
@@ -93,18 +93,18 @@ class Moodle(IAssignmentStore):
                                          email = item['email'] if 'email' in item else '',
                                          role = item['roles'][0]['name']
                                         )
-            self.__participants.append(newParticipant)
+            self.__participants[newParticipant.lmsID] = newParticipant
             #console(newParticipant)
         return self.__participants
 
-    # =======================================================================
+    '''# =======================================================================
     # function to retrieve a participant based on the LMS id number
     # =======================================================================
     def __getParticipantFromId(self, lsmID) -> Participant:
         for participant in self.__participants:
             if participant.lmsID == lsmID:
                 return participant
-        return None
+        return None'''
 
     # =======================================================================
     # function to retrieve available courses from the LMS
@@ -209,7 +209,7 @@ class Moodle(IAssignmentStore):
     # =======================================================================
     # function that returns the currently selected assignment
     # =======================================================================
-    def __getSubmissions(self, blindSubmission=False):
+    def __getSubmissions(self):
         func = 'mod_assign_get_submissions'
         args = {}
         args['assignmentids[0]'] = self.__selectedAssignment.assignmentID
@@ -223,7 +223,6 @@ class Moodle(IAssignmentStore):
         # id, userid, status, gradingstatus, plugins[0*]['fileareas'*]['files']['filename' and 'fileurl']
 
         for fullSubmission in fullSubmissions:
-
             #create a new submission object
             newSubmission = Submission()
 
@@ -234,12 +233,11 @@ class Moodle(IAssignmentStore):
                             newSubmission.submissionFiles.append(file['fileurl'])
 
             newSubmission.submissionID = fullSubmission['id']
-            if blindSubmission:
-                newSubmission.studentName = newSubmission.studentName = fullSubmission['userid']
-            else:
-                newSubmission.studentName = self.__getParticipantFromId(fullSubmission['userid']).name
+            newSubmission.participant = self.__participants.get( fullSubmission['userid'], None )
 
-            self.__selectedAssignment.submissions.append(newSubmission)
+            #only want student submissions
+            if newSubmission.participant.role == 'Student':
+                self.__selectedAssignment.submissions.append(newSubmission)
 
         return self.__selectedAssignment.submissions
 
@@ -281,7 +279,6 @@ class Moodle(IAssignmentStore):
     # before using this function.
     # =======================================================================
     def downloadSubmissions(self):
-        submissionDir = ''
         for submission in self.__selectedAssignment.submissions:
             for index in range(len(submission.submissionFiles)):
                 submissionFile = submission.submissionFiles[index]
@@ -289,7 +286,7 @@ class Moodle(IAssignmentStore):
                 targetFilePath = os.path.join(self.__workingDirectory, 'courses',
                                               str(self.__selectedCourse.courseID),
                                               str(self.__selectedAssignment.assignmentID),
-                                              submission.studentName,
+                                              submission.participant.name,
                                               os.path.basename(unquote(submissionFile)) )
 
                 self.readFileToDisk(submissionFile, targetFilePath)

@@ -112,10 +112,10 @@ class ReportGenerator(IAGConstant):
             instructorComment = "None" if (submission.instructorComment is None or submission.instructorComment == '') \
                     else submission.instructorComment.replace("\n", "<br>")
 
-            self.__summary += "<a id=\"" + submission.studentName + "\"></a>\n"
+            self.__summary += "<a id=\"" + submission.participant.name + "\"></a>\n"
             # self.__summary += "<hr width=\"100%\" align=\"left\">"
             self.__summary += "<hr><font face=\"verdana\" color=\"black\">"
-            self.__summary += "<b>" + submission.studentName + "</b><br>Grade<br>"
+            self.__summary += "<b>" + submission.participant.name + "</b><br>Grade<br>"
             self.__summary += "<font face=\"verdana\" color=\"blue\">"
             self.__summary += grade + "<br>"
             self.__summary += "<font face=\"verdana\" color=\"black\">Instructor comments<br>"
@@ -137,8 +137,8 @@ class ReportGenerator(IAGConstant):
         htmlReport = agDocument.htmlReport
 
         for submission in agDocument.gradingEngine.submissions:
-            gradeID = submission.studentName + cls.HTML_GRADE_ID_SUFFIX
-            commentID = submission.studentName + cls.HTML_COMMENT_ID_SUFFIX
+            gradeID = submission.participant.name + cls.HTML_GRADE_ID_SUFFIX
+            commentID = submission.participant.name + cls.HTML_COMMENT_ID_SUFFIX
 
             # For the grade, the entry is part of the the "value=" statement.
             # The insertion point is right before the closing ">" of the
@@ -261,9 +261,9 @@ class ReportGenerator(IAGConstant):
         report = ""
 
         report += "<font face=\"verdana\" color=\"" + self.__HEADER_COLOR1 + "\">"
-        report += "<a id=\"" + submission.studentName + "\"></a>\n"
+        report += "<a id=\"" + submission.participant.name + "\"></a>\n"
         report += "<br>\n=======================================================<br>\n"
-        report += submission.studentName + "<br>\n"
+        report += submission.participant.name + "<br>\n"
 
         # we have 3 cases to consider here:
         # 1) there are no submissions files.  In this case, we simply want to state
@@ -454,11 +454,11 @@ class ReportGenerator(IAGConstant):
         # create the grade input text field and comment textarea and populate
         # them with the associated submission fields.
         self.__document += "<font face=\"courier\" color=\"" + self.__FEEDBACK_COLOR + "\">" \
-                + "<br>Instructor Feedback for " + submission.studentName \
+                + "<br>Instructor Feedback for " + submission.participant.name \
                 + "</font><br><table><tr><td>Grade <i>(int)</i>:<br><input type=\"text\" id=\"" \
-                + submission.studentName + self.HTML_GRADE_ID_SUFFIX + "\" value=" + grade + "><br><br><br><br></td><td>" \
+                + submission.participant.name + self.HTML_GRADE_ID_SUFFIX + "\" value=" + grade + "><br><br><br><br></td><td>" \
                 + "&nbsp;&nbsp;&nbsp;</td><td>Comment:<br><textarea id=\"" \
-                + submission.studentName + self.HTML_COMMENT_ID_SUFFIX + "\" rows=4 cols=60>" + instructorComment + "</textarea></td></tr></table>"
+                + submission.participant.name + self.HTML_COMMENT_ID_SUFFIX + "\" rows=4 cols=60>" + instructorComment + "</textarea></td></tr></table>"
 
 
 

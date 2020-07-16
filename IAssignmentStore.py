@@ -45,6 +45,14 @@ class IAssignmentStore(object):
     def getSelectedAssignment(self) -> Assignment:
         raise NotImplementedError()
 
+
+    # =======================================================================
+    # function that downloads all submissions to disk following the convention
+    # course->assignment->[submissions]
+    # =======================================================================
+    def downloadSubmissions(self):
+        raise NotImplementedError
+
     # =======================================================================
     # function to submit graded assignments back to the LMS
     # =======================================================================
