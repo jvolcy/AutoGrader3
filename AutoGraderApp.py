@@ -26,6 +26,7 @@ def main():
                             securityKey = autoGrader.getConfiguration(autoGrader.AG_CONFIG.MOODLE_KEY),
                             email = autoGrader.getConfiguration(autoGrader.AG_CONFIG.MOODLE_EMAIL)
                             )
+    autoGrader.lms.setWorkingDirectory(workingDirectory)
 
     # 3 fetch the available courses
     courses = autoGrader.lms.getCourses()
@@ -51,15 +52,21 @@ def main():
 
     print('--------------------')
     print('7 submissions:\n')
-    for i in range(7):
-        print('--------------------')
-        print(autoGrader.lms.getSelectedAssignment().submissions[i])
-        #print(autoGrader.lms.getSelectedAssignment().submissions[i].submissionFiles)
-
 
     # 7 configure the autoGrader
     autoGrader._agDocument.assignmentName = autoGrader.lms.getSelectedAssignment().assignmentName
     autoGrader._agDocument.gradingEngine.submissions = autoGrader.lms.getSelectedAssignment().submissions
+
+
+    '''for i in range(7):
+        print('--------------------')
+        print(autoGrader.lms.getSelectedAssignment().submissions[i])'''
+
+    autoGrader.lms.downloadSubmissions()
+
+    '''for i in range(7):
+        print('--------------------')
+        print(autoGrader.lms.getSelectedAssignment().submissions[i])'''
 
     return
 

@@ -1,7 +1,9 @@
 from IAssignmentStore import IAssignmentStore
 from Assignment import *
 from urllib.request import urlopen
-import json
+from urllib.parse import unquote
+import json, os
+from console import console
 
 # =======================================================================
 # Moodle LMS Interface class
@@ -18,7 +20,7 @@ class Moodle(IAssignmentStore):
 
         # get the userid
         self.__getUserId()
-        print('Moodle userid set to', self.__userid)
+        console(f'Moodle userid set to {self.__userid}')
 
         self.__courses = []
         self.__selectedCourse = None    #Course()
@@ -26,6 +28,8 @@ class Moodle(IAssignmentStore):
 
         self.__assignments = []
         self.__selectedAssignment = None
+
+        self.__workingDirectory = None
 
     # =======================================================================
     # xxx
@@ -42,12 +46,10 @@ class Moodle(IAssignmentStore):
     # ======================================================================
     def __moodleExeWebCmd(self, url):
         # Get the html data for the website
-        # print(url)
         client = urlopen(url)
         htmlByteData = client.read()
         client.close()
         result = json.loads(htmlByteData.decode())
-        # print(result)
         return result
 
 
@@ -63,7 +65,6 @@ class Moodle(IAssignmentStore):
         cmdUrl = self.__moodleBuildWebCmd(func, args)
         result = self.__moodleExeWebCmd(cmdUrl)
 
-        # print(result)
         if 'id' in result[0]:
             self.__userid = result[0]['id']
         else:
@@ -137,10 +138,10 @@ class Moodle(IAssignmentStore):
         self.__courses.clear()
 
         for item in result:
-            newCourse = Course(courseName=item['shortname'],
-                               courseID=item['id'],
-                               courseDescription=item['fullname'],
-                               term=None)
+            newCourse = Course(courseName = item['shortname'],
+                               courseID = item['id'],
+                               courseDescription = item['fullname'],
+                               term = None)
 
             #classes.append({'class_id': item['id'], 'shortname': item['shortname'], 'fullname': item['fullname']})
             self.__courses.append(newCourse)
@@ -182,7 +183,7 @@ class Moodle(IAssignmentStore):
         for item in result['courses'][0]['assignments']:
             newAssignment = Assignment()
             newAssignment.assignmentName = item['name']
-            newAssignment.assignmentID = item['id']
+            newAssignment.assignmentID = int(item['id'])
             newAssignment.assignmentDirectory = ''
 
             self.__assignments.append(newAssignment)
@@ -226,7 +227,7 @@ class Moodle(IAssignmentStore):
             #create a new submission object
             newSubmission = Submission()
 
-            for plugin in fullSubmissions[1]['plugins']:
+            for plugin in fullSubmission['plugins']:
                 if plugin['type'] == 'file':
                     for filearea in plugin['fileareas']:
                         for file in filearea['files']:
@@ -244,6 +245,57 @@ class Moodle(IAssignmentStore):
 
 
     # =======================================================================
+    # function that reads the data from a Moodle file given the file's
+    # URL.
+    # =======================================================================
+    def readFile(self, fileurl):
+        x = urlopen(fileurl + '?&token=' + self.__moodleWebServiceSecurityKey)
+        data = x.read()
+        x.close()
+        return data
+
+
+    # =======================================================================
+    # function that reads the data from a Moodle file given that file's
+    # URL.  The data is written to the provided file.
+    # =======================================================================
+    def readFileToDisk(self, fileurl, outputFilePath):
+        console(f'downloading %s to\n--> %s', fileurl, outputFilePath)
+
+        data = self.readFile(fileurl)
+
+        #create the directories in the outputFilePath if necessary.
+        path, filename = os.path.split(outputFilePath)
+
+        os.makedirs(path, exist_ok=True)   #create all subdirectories that do not exist in the path
+
+        #write the output to the file
+        outFile = open(outputFilePath, 'wb')
+        outFile.write(data)
+        outFile.close()
+
+    # =======================================================================
+    # function to download all submissions from the selected assignment to
+    # disk.  The path is workingDirectory/courses/assignmentID/studentName/file.py
+    # You should have executed a selectAssignment() or __getSubmissions()
+    # before using this function.
+    # =======================================================================
+    def downloadSubmissions(self):
+        for submission in self.__selectedAssignment.submissions:
+            for index in range(len(submission.submissionFiles)):
+                submissionFile = submission.submissionFiles[index]
+                # Note: use urllib.parse.unquote() to replace %20 with ' ', for example
+                targetFilePath = os.path.join(self.__workingDirectory, 'courses',
+                                              str(self.__selectedCourse.courseID),
+                                              str(self.__selectedAssignment.assignmentID),
+                                              submission.studentName,
+                                              os.path.basename(unquote(submissionFile)) )
+
+                self.readFileToDisk(submissionFile, targetFilePath)
+                # point to the local copy now
+                submission.submissionFiles[index] = targetFilePath
+
+    # =======================================================================
     # function to submit graded assignments back to the LMS
     # =======================================================================
     def submitAssignment(self, assignment):
@@ -251,15 +303,16 @@ class Moodle(IAssignmentStore):
 
     # =======================================================================
     # specify a place where the LMS will download and store assignment files
+    # The working directory is parent to the 'courses' directory.
     # =======================================================================
     def setWorkingDirectory(self, workingDirectory):
-        raise NotImplementedError()
+        self.__workingDirectory = workingDirectory
 
     # =======================================================================
     # function that returns the currently selected assignment
     # =======================================================================
     def getWorkingDirectory(self) -> str:
-        raise NotImplementedError()
+        return self.__workingDirectory
 
 
 # =======================================================================
