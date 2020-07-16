@@ -84,6 +84,45 @@ def _discoverPrimarySubmissionFile(self, submission):
     #This does not matter for C++.
     return
 
+
+# =======================================================================
+# _autoDetectLanguage
+# =======================================================================
+def _autoDetectLanguage(self):
+    # define a variable that will be used to set the language for all submissions assignment
+    submissionLanguage = IAGConstant.LANGUAGE_AUTO
+
+    # now go through every submission until we find either a python of c++ file
+    # the first one we find will be assumed to represent the language for all submissions
+    for submission in self._agDocument.gradingEngine.submissions:
+        # attempt to auto-detect the language.  This is a very primitive method:  The very first
+        # file that is in the pythons or C++ extension list sets the langauge for the entire assignment
+        if submission.language == IAGConstant.LANGUAGE_AUTO or submission.language == '':
+            for file in submission.submissionFiles:
+                # get the file extension
+                filename, file_extension = os.path.splitext(file)
+                file_extension = file_extension.lstrip('.')
+
+                if file_extension in IAGConstant.PYTHON_EXTENSIONS:
+                    submissionLanguage = IAGConstant.LANGUAGE_PYTHON3
+                    console("Python auto-detected.")
+                    break
+
+                if file_extension in IAGConstant.CPP_EXTENSIONS:
+                    submissionLanguage = IAGConstant.LANGUAGE_CPP
+                    console("C++ auto-detected")
+                    # language changed: change the language of the current submission
+                    break
+        else:
+            # we already have a language.  Use it for all submissions
+            submissionLanguage = submission.language
+            break
+
+    #update all submissions with the same language.
+    for submission in self._agDocument.gradingEngine.submissions:
+        submission.language = submissionLanguage
+
+
 # =======================================================================
 # _updateAutoGraderConfiguration
 # =======================================================================
@@ -215,6 +254,9 @@ def grade(self):
         pass
 
     self.breakOutTestFiles( testOutputDir )
+
+    #  attempt to auto-detect the language for the entire assignment
+    self._autoDetectLanguage()
 
     #attempt to discover the primary submission file for each submission
     for submission in self._agDocument.gradingEngine.submissions:

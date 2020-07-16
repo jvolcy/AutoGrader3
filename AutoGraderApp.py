@@ -57,7 +57,7 @@ def main():
     autoGrader._agDocument.assignmentName = autoGrader.lms.getSelectedAssignment().assignmentName
     autoGrader._agDocument.gradingEngine.submissions = autoGrader.lms.getSelectedAssignment().submissions
 
-
+    return
     '''for i in range(7):
         print('--------------------')
         print(autoGrader.lms.getSelectedAssignment().submissions[i])'''
@@ -68,10 +68,13 @@ def main():
         print('--------------------')
         print(autoGrader.lms.getSelectedAssignment().submissions[i])'''
 
-    return
-
     # ** THIS IS WHERE WE PUT THE INFORMATION NORMALLY GATHERED THROUGH THE GUI.
     # Warning: This will fail if there are no submissions
+
+    # this is a hack needed for the purposes of selecting which set of testfiles will be used in simulation.
+    # the grading engine calls _autoDetectLanguage() when it runs grade()
+    autoGrader._autoDetectLanguage()
+
     if autoGrader.lms.getSelectedAssignment().submissions[0].language == autoGrader.LANGUAGE_PYTHON3:
         # 7a set the list of test data and data files for python assignments
         autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-1.txt')
@@ -89,13 +92,13 @@ def main():
     autoGrader.grade()
 
     # 9 Retrieve the html report
-    rg = ReportGenerator(title="AutoGrader 3.0",
-                         headerText=autoGrader.lms.getSelectedAssignment().assignmentName + " (" + autoGrader.lms.getSelectedAssignment().assignmentID + ")",
-                         submissions=autoGrader.lms.getSelectedAssignment().submissions,
-                         testDataFiles=autoGrader._agDocument.gradingEngine.testDataFiles)
+    rg = ReportGenerator(title = "AutoGrader 3.0",
+                         headerText = f"{autoGrader.lms.getSelectedAssignment().assignmentName}  ({autoGrader.lms.getSelectedAssignment().assignmentID})",
+                         submissions = autoGrader.lms.getSelectedAssignment().submissions,
+                         testDataFiles = autoGrader._agDocument.gradingEngine.testDataFiles)
     rg.generateReport()
 
-    assignmentDirectory = os.path.join(workingDirectory, 'courses', autoGrader.lms.getSelectedCourse().courseID, autoGrader.lms.getSelectedAssignment().assignmentID)
+    assignmentDirectory = os.path.join(workingDirectory, 'courses', str(autoGrader.lms.getSelectedCourse().courseID), str(autoGrader.lms.getSelectedAssignment().assignmentID))
     rg.writeReportToFile(os.path.join(os.path.dirname(assignmentDirectory), os.path.basename(assignmentDirectory) + '.html'))
 
     # 10 save AG config options

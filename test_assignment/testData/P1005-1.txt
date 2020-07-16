@@ -1,1 +1,3 @@
+100
+
 the final step is to add some layout constraints to ensure that the label remains centered within the containing view regardless of the size of screen on which the application ultimately runs  this involves the use of the auto layout capabilities of iOS a topic which will be covered extensively in later chapters  for this example simply select the Label object  display the align menu as shown in figure 4-11 and enable both the horizontally in Container and vertically in container options with offsets of 0 before clicking on the Add 2 constraints button.

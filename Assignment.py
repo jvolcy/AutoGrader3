@@ -53,8 +53,8 @@ class Submission(object):
         self.submissionID = None
         self.studentName = ''
         self.submissionDirectory = ''
-        self.submissionFiles = []  # array of file objects
-        self.primarySubmissionFile = None  # file object
+        self.submissionFiles = []  # array of file names
+        self.primarySubmissionFile = None  # file name
         self.language = ''
         # ---------- code analysis members ----------
         # self.linesOfCode = 0

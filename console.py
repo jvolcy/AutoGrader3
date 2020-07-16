@@ -14,7 +14,7 @@ class Console:
     def console(cls, fmt, *args):
         if cls.__consoleFunc == None:
             #print('fmt=', fmt, 'args=', *args)
-            print('[x] ' + fmt % args)
+            print('[x] ' + str(fmt) % args)
             sys.stdout.flush()
         else:
             cls.__consoleFunc('[c] ' + fmt % args)

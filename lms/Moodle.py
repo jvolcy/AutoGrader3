@@ -94,7 +94,7 @@ class Moodle(IAssignmentStore):
                                          role = item['roles'][0]['name']
                                         )
             self.__participants.append(newParticipant)
-
+            #console(newParticipant)
         return self.__participants
 
     # =======================================================================
@@ -281,6 +281,7 @@ class Moodle(IAssignmentStore):
     # before using this function.
     # =======================================================================
     def downloadSubmissions(self):
+        submissionDir = ''
         for submission in self.__selectedAssignment.submissions:
             for index in range(len(submission.submissionFiles)):
                 submissionFile = submission.submissionFiles[index]
@@ -294,6 +295,9 @@ class Moodle(IAssignmentStore):
                 self.readFileToDisk(submissionFile, targetFilePath)
                 # point to the local copy now
                 submission.submissionFiles[index] = targetFilePath
+                # set the submission directory
+                submission.submissionDirectory = os.path.dirname(targetFilePath)
+
 
     # =======================================================================
     # function to submit graded assignments back to the LMS

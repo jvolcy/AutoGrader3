@@ -46,6 +46,7 @@ class AutoGrader3(IAGConstant):
     from ._agGrader import addTestDataFile
     from ._agGrader import breakOutTestFiles
     from ._agGrader import grade
+    from ._agGrader import _autoDetectLanguage
 
     # MOSS
     from ._agGrader import _runMoss
