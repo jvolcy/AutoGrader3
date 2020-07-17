@@ -1,6 +1,6 @@
 import sys
 import socket
-from console import console
+from .console import console
 
 
 ''' ======================================================================

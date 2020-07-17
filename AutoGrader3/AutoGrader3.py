@@ -5,11 +5,11 @@ from shutil import rmtree
 from pathlib import Path
 import threading
 import subprocess
-from IAGConstant import IAGConstant
-from console import console
-from AGDocument import AGDocument
-from MossClient import MossClient
-from GradingEngine import GradingEngine
+from .IAGConstant import IAGConstant
+from .console import console
+from .AGDocument import AGDocument
+from .MossClient import MossClient
+from .GradingEngine import GradingEngine
 import json
 
 

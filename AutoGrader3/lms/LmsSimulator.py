@@ -1,8 +1,8 @@
-from IAssignmentStore import IAssignmentStore
-from Assignment import *
-from IAGConstant import IAGConstant
+from ..IAssignmentStore import IAssignmentStore
+from ..Assignment import *
+from ..IAGConstant import IAGConstant
 import os
-from console import console
+from ..console import console
 
 
 # =======================================================================

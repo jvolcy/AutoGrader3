@@ -1,9 +1,9 @@
 import os.path
 import sys
-from IAGConstant import IAGConstant
-from console import console
-from AutoGraderAppInfo import VERSION
-from CodeAnalyzer import CodeAnalyzer
+from .IAGConstant import IAGConstant
+from .console import console
+from .AutoGraderAppInfo import VERSION
+from .CodeAnalyzer import CodeAnalyzer
 import time
 
 

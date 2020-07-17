@@ -1,4 +1,4 @@
-from Assignment import Assignment, Course
+from .Assignment import Assignment, Course
 
 
 # =======================================================================

@@ -1,8 +1,7 @@
-from console import console
-from AutoGrader3 import AutoGrader3
-from lms.LmsSimulator import LmsSimulator
-from lms.Moodle import Moodle
-from ReportGenerator import ReportGenerator
+from AutoGrader3.console import console
+from AutoGrader3.AutoGrader3 import AutoGrader3
+from AutoGrader3.lms.LmsSimulator import LmsSimulator
+from AutoGrader3.ReportGenerator import ReportGenerator
 import os
 
 # =======================================================================

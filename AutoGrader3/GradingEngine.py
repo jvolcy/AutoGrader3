@@ -1,5 +1,5 @@
-from IAGConstant import IAGConstant
-from console import console
+from .IAGConstant import IAGConstant
+from .console import console
 import subprocess
 import os
 import sys

@@ -1,5 +1,5 @@
 import sys
-from console import console
+from .console import console
 
 class CppAnalysis (object):
     def __init__(self, numLines, numComments):
