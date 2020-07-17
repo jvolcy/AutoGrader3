@@ -1,4 +1,4 @@
-from GradingEngine import GradingEngine
+from Assignment import Assignment
 
 # =======================================================================
 # AGDocument class
@@ -6,6 +6,8 @@ from GradingEngine import GradingEngine
 class AGDocument(object):
     def __init__(self):
         self.assignmentName = ''
-        self.gradingEngine = GradingEngine()       # a GradingEngine() object
+        self.assignmentID = ''
+        self.assignment = Assignment()  # the one and only assignment object
         self.htmlReport = ''
-        self.dataFiles = []       # a list of input data files needed by the program
+        self.dataFiles = []       # a list of input data files needed by the programs under test
+        self.testDataFiles = []       # a list of test files.

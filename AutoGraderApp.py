@@ -17,7 +17,6 @@ def main():
 
     # 1 instantiate the AutoGrader3 object
     autoGrader = AutoGrader3()
-    autoGrader.saveConfiguration()
 
     # 2 instantiate an LMS object, specifying the working directory
     autoGrader.lms = LmsSimulator(workingDirectory)
@@ -55,8 +54,9 @@ def main():
     print('7 submissions:\n')
 
     # 7 configure the autoGrader
-    autoGrader._agDocument.assignmentName = autoGrader.lms.getSelectedAssignment().assignmentName
-    autoGrader._agDocument.gradingEngine.submissions = autoGrader.lms.getSelectedAssignment().submissions
+    autoGrader.agDocument.assignmentName = autoGrader.lms.getSelectedAssignment().assignmentName
+    autoGrader.agDocument.assignment.submissions = autoGrader.lms.getSelectedAssignment().submissions
+    autoGrader.gradingEngine.agDocument = autoGrader.agDocument
 
 
     '''for i in range(7):
@@ -96,12 +96,14 @@ def main():
     rg = ReportGenerator(title = "AutoGrader 3.0",
                          headerText = f"{autoGrader.lms.getSelectedAssignment().assignmentName}  ({autoGrader.lms.getSelectedAssignment().assignmentID})",
                          submissions = autoGrader.lms.getSelectedAssignment().submissions,
-                         testDataFiles = autoGrader._agDocument.gradingEngine.testDataFiles)
+                         testDataFiles = autoGrader.agDocument.testDataFiles)
     rg.generateReport()
 
     assignmentDirectory = os.path.join(workingDirectory, 'courses', str(autoGrader.lms.getSelectedCourse().courseID), str(autoGrader.lms.getSelectedAssignment().assignmentID))
     outputFile = os.path.join(os.path.dirname(assignmentDirectory), os.path.basename(assignmentDirectory) + '.html')
     rg.writeReportToFile(outputFile)
+
+    autoGrader.agDocument.htmlReport = rg.getDocument()
 
     console('Report Generator output: file://' + outputFile)
     # 10 save AG config options
@@ -118,9 +120,6 @@ main()
 # =======================================================================
 # To Do
 # Auto version incrementing
-# copy data files to submission folders
-# make a subdirectory in the TLD for extracted test files
-# clean up data files and extracted test files
 # ======================================================================
 
 

@@ -52,8 +52,8 @@ class GradingEngine(IAGConstant):
     # ======================================================================
     def __init__(self):
         # The submissions list.
-        self.submissions = []
-        self.testDataFiles = []
+        self.agDocument = None
+        #self.agDocument.testDataFiles = []
         #private String outputFileName;
         self.__tempOutputDirectory = None
         self.__bIncludeSourceInOutput = True
@@ -114,26 +114,6 @@ class GradingEngine(IAGConstant):
 
 
     # =======================================================================
-    # xxx
-    # ======================================================================
-    '''
-    public void setOutputFileName(String fileName) {
-        outputFileName = fileName;
-        File f = new File(fileName);
-        outputDirectory =  f.getParent();
-        console("output directory = " + outputDirectory);
-    }
-    '''
-
-    # =======================================================================
-    # xxx
-    # ======================================================================
-    '''
-    public String getOutputFileName() {
-        return outputFileName;
-    }
-    '''
-    # =======================================================================
     # private String fileNameFromPathName(String pathName)
     # ======================================================================
     def __fileNameFromPathName(self, pathName):
@@ -157,12 +137,6 @@ class GradingEngine(IAGConstant):
 
         return None
 
-
-    # =======================================================================
-    # private String readFromFile(File file)
-    # ======================================================================
-    #def __readFromFile(self, fileName):
-    #    return readFromFile(os.path.abspath(file))
 
 
     # =======================================================================
@@ -217,31 +191,12 @@ class GradingEngine(IAGConstant):
 
 
     # =======================================================================
-    # private String readFromFile(File file, int maxLines)
-    # ======================================================================
-    #private String readFromFile(File file, int maxLines) {
-    #    return readFromFile(os.path.abspath(file), maxLines)
-    #}
-
-    # =======================================================================
     # private String getFileExtension(String fileName)
     # returns the extension of the given filename.
     # ======================================================================
     def __getFileExtension(self, fileName):
         return os.path.splitext(fileName)[1].lstrip('.')
 
-
-
-    # =======================================================================
-    # private String getFileExtension(File f)
-    # overloaded version of the getFileExtension() method that accepts
-    # a File object as an argument and returns the string extension of the
-    # corresponding file.
-    # ======================================================================
-    #private String getFileExtension(File f) {
-    #    String fileName = f.getName();
-    #    return getFileExtension(fileName);
-    #}
 
     # =======================================================================
     # private ArrayList<Integer> getPidFromToken(String token)
@@ -285,18 +240,7 @@ class GradingEngine(IAGConstant):
         #Delineate the start of the unformatted py code output with a token: PROG_OUTPUT_START_TOKEN.
         #Flank with '\n's to ensure the token is on a line by itself
 
-        '''
-        #create a temp file to capture program output
-        File tmpFile = new File(tempOutputDirectory + "/TEMP.AB");
 
-        #delete any previous temp file in the output directory.
-        try {
-            #delete the temporary file if it exists, ignoring any "file not found" errors.
-            tmpFile.delete();
-        } catch (Exception e) {
-            #ignore errors from the delete operation
-        }
-       '''
         # compile the code
         compile_args = "\"" + compiler + "\" -o \"" + exeFile + "\" "
 
@@ -455,7 +399,7 @@ class GradingEngine(IAGConstant):
                         "\"" + sourceFile + "\""
             else:
                 # we have test files: use them to redirect stdin in the exec command
-                dataFileName = os.path.abspath(self.testDataFiles[i])
+                dataFileName = os.path.abspath(self.agDocument.testDataFiles[i])
                 cmd = "\"" + self.__python3Interpreter + "\" " + \
                         "\"" + sourceFile + "\"" + " < \"" + dataFileName + "\""
 
@@ -517,7 +461,7 @@ class GradingEngine(IAGConstant):
                 cmd = "\"" + exeFile + "\" "
             else:
                 # we have test files: use them to redirect stdin in the exec command
-                dataFileName = os.path.abspath(self.testDataFiles[i])
+                dataFileName = os.path.abspath(self.agDocument.testDataFiles[i])
                 cmd = "\"" + exeFile + "\" " + " < \"" + dataFileName + "\""
 
             exeFile = os.path.abspath(exeFile)
@@ -558,13 +502,13 @@ class GradingEngine(IAGConstant):
         # int numTests;
         # boolean bNoTestFiles;       #set a flag to denote no test files
 
-        if self.testDataFiles is None:
+        if self.agDocument.testDataFiles is None:
             #submission.testFiles is null.  Assume there are no test
             #files.  Set numTests to 1.
             numTests = 1
             bNoTestFiles = True
         else:
-            numTests = len(self.testDataFiles)
+            numTests = len(self.agDocument.testDataFiles)
 
             if numTests == 0:
                 # =while there are no test files, we must set numTests to 1 in order to
@@ -613,7 +557,7 @@ class GradingEngine(IAGConstant):
     # ======================================================================
     def processSubmissions(self):
         self.bAbortRequest = False
-        self.processingStatus = ProcessingStatus(True, "", 1, 1, len(self.submissions))
+        self.processingStatus = ProcessingStatus(True, "", 1, 1, len(self.agDocument.assignment.submissions))
 
         #---------- start the grading service ----------
         self.__gradingServiceThread = threading.Thread(target=gradingServiceThread, args=(self,))
@@ -628,9 +572,9 @@ class GradingEngine(IAGConstant):
     # of the Submissions array list to the screen.
     # ======================================================================
     def dumpSubmissions(self):
-        console("[" + str(len(self.submissions)) + "] submission(s) found.")
+        console("[" + str(len(self.agDocument.assignment.submissions)) + "] submission(s) found.")
 
-        for submission in self.submissions:
+        for submission in self.agDocument.assignment.submissions:
             console("------------------------------------------")
             console("studentName = " + submission.participant.name)
             console("submissionDirectory = " + submission.submissionDirectory)
@@ -647,8 +591,8 @@ class GradingEngine(IAGConstant):
                 if len(submission.submissionFiles) == 0:
                     console("No programming files found.")
                 else:
-                    for i in range (len(self.testDataFiles)):
-                        console("---> Results for test file %s: ", self.testDataFiles[i])
+                    for i in range (len(self.agDocument.testDataFiles)):
+                        console("---> Results for test file %s: ", self.agDocument.testDataFiles[i])
                         if submission.runtimeErrors is not None:
                             console("Compiler/Limit Errors: %s", submission.runtimeErrors[i])
 
@@ -670,9 +614,6 @@ class GradingEngine(IAGConstant):
         self.bAbortRequest = True
 
 
-
-
-
 # =======================================================================
 # xxx
 # ======================================================================
@@ -682,7 +623,7 @@ def gradingServiceThread(gradingEngine):
 
     #gradingEngine.dumpSubmissions()
 
-    for submission in gradingEngine.submissions:
+    for submission in gradingEngine.agDocument.assignment.submissions:
         console("Processing " + submission.participant.name)
         gradingEngine.processingStatus.message = submission.participant.name
         gradingEngine.execSubmission(submission)

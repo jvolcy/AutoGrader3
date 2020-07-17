@@ -29,8 +29,7 @@ class Course(object):
 
 # =======================================================================
 # Assignment
-# This is an LMS exchange object.  All transactions to and from the
-# LMS is through an Assignment object
+# This is the central data structure for the autograder
 # =======================================================================
 class Assignment(object):
     def __init__(self):
@@ -38,6 +37,7 @@ class Assignment(object):
         self.assignmentID = None
         self.assignmentDirectory = None
         self.submissions = []  # array of Submission objects
+        self.course = None  # the parent course for this assignment
 
     def __str__(self):
         return f'Assignment ID: {self.assignmentID}\nAssignment Name: {self.assignmentName}\n\
