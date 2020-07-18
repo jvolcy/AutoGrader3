@@ -1,9 +1,9 @@
-from IAssignmentStore import IAssignmentStore
-from Assignment import *
+from ..IAssignmentStore import IAssignmentStore
+from ..Assignment import *
 from urllib.request import urlopen
 from urllib.parse import unquote
 import json, os
-from console import console
+from ..console import console
 
 # =======================================================================
 # Moodle LMS Interface class

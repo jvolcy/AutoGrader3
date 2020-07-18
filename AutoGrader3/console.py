@@ -11,13 +11,11 @@ class Console:
     __consoleFunc = None
 
     @classmethod
-    def console(cls, fmt, *args):
-        if cls.__consoleFunc == None:
-            #print('fmt=', fmt, 'args=', *args)
-            print('[x] ' + str(fmt) % args)
-            sys.stdout.flush()
-        else:
-            cls.__consoleFunc('[c] ' + fmt % args)
+    def console(cls, strToPrint):
+        print('[c] ' + strToPrint)
+        sys.stdout.flush()
+        if cls.__consoleFunc is not None:
+            cls.__consoleFunc(strToPrint)
 
     @classmethod
     def setConsole(cls, targetFunc):

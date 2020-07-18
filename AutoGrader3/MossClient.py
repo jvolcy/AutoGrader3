@@ -66,7 +66,6 @@ class MossClient:
     * default values of the MOSS server and port# are provided
     * ===================================================================== '''
     def __init__ (self, userid='', server=__DEFAULT_MOSS_SERVER, port=__DEFAULT_MOSS_PORT):
-        console("MOSS: Setting User ID to " + userid)
         #store the userid, server and port #
         self.__userid = userid      #moss userid
         self.__server = server      #moss server

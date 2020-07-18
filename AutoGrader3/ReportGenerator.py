@@ -179,7 +179,7 @@ class ReportGenerator(IAGConstant):
             bw = open(fileName, 'wt')
             bw.write(self.__document)
             bw.close()
-            console("Writing file %s.", fileName)
+            console("Writing file {fileName}.")
         except:
             e = sys.exc_info()[0]
             console("writeReportToFile(): " + str(e))

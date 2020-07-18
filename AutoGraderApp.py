@@ -3,6 +3,7 @@ from AutoGrader3.AutoGrader3 import AutoGrader3
 from AutoGrader3.lms.LmsSimulator import LmsSimulator
 from AutoGrader3.ReportGenerator import ReportGenerator
 import os
+from pathlib import Path
 
 # =======================================================================
 # public static void main(String[] args)
@@ -12,13 +13,16 @@ def main():
     console("main...")
 
     # define the working directory where courses are stored
-    workingDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment'
+    workingDirectory = os.path.join(str(Path.home()), '_auto_grader')
+    os.makedirs(workingDirectory, exist_ok=True)
+
+    #workingDirectory = '/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment'
 
     # 1 instantiate the AutoGrader3 object
     autoGrader = AutoGrader3()
 
     # 2 instantiate an LMS object, specifying the working directory
-    autoGrader.lms = LmsSimulator(workingDirectory)
+    autoGrader.lms = LmsSimulator()
 
     '''autoGrader.lms = Moodle(server = autoGrader.getConfiguration(autoGrader.AG_CONFIG.MOODLE_SERVER),
                             securityKey = autoGrader.getConfiguration(autoGrader.AG_CONFIG.MOODLE_KEY),
@@ -33,7 +37,7 @@ def main():
         print(course)
 
     # 4 select one of the courses.
-    autoGrader.lms.selectCourse(courses[0])  #8
+    autoGrader.lms.selectCourse(courses[1])  #8
 
     # 5 fetch the available assignments for the selected course
     assignments = autoGrader.lms.getAssignments()
@@ -77,15 +81,15 @@ def main():
 
     if autoGrader.lms.getSelectedAssignment().submissions[0].language == autoGrader.LANGUAGE_PYTHON3:
         # 7a set the list of test data and data files for python assignments
-        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-1.txt')
-        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/P1005-2.txt')
+        autoGrader.addTestDataFile(os.path.join(workingDirectory, 'testData/P1005-1.txt'))
+        autoGrader.addTestDataFile(os.path.join(workingDirectory, 'testData/P1005-2.txt'))
         autoGrader.addDataFile('/Users/jvolcy/Documents/words.txt')
     else:
         # 7b set the list of test data and data files for c++ assignments
-        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/C1014.txt')
-        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/C1014a.txt')
-        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/C1014b.txt')
-        autoGrader.addTestDataFile('/Users/jvolcy/Documents/Spelman/Projects/AutoGrader3/test_assignment/testData/C1014c.txt')
+        autoGrader.addTestDataFile(os.path.join(workingDirectory, 'testData/C1014.txt'))
+        autoGrader.addTestDataFile(os.path.join(workingDirectory, 'testData/C1014a.txt'))
+        autoGrader.addTestDataFile(os.path.join(workingDirectory, 'testData/C1014b.txt'))
+        autoGrader.addTestDataFile(os.path.join(workingDirectory, 'testData/C1014c.txt'))
 
 
     # 8 Execute the grading

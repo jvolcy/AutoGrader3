@@ -592,18 +592,18 @@ class GradingEngine(IAGConstant):
                     console("No programming files found.")
                 else:
                     for i in range (len(self.agDocument.testDataFiles)):
-                        console("---> Results for test file %s: ", self.agDocument.testDataFiles[i])
+                        console(f"---> Results for test file {self.agDocument.testDataFiles[i]}:")
                         if submission.runtimeErrors is not None:
-                            console("Compiler/Limit Errors: %s", submission.runtimeErrors[i])
+                            console(f"Compiler/Limit Errors: {submission.runtimeErrors[i]}")
 
                         if submission.progOutputs is not None:
-                            console("Output: %s", submission.progOutputs[i])
+                            console(f"Output: {submission.progOutputs[i]}")
 
                         if submission.executionTimes is not None:
-                            console("Execution Time: %s sec.", submission.executionTimes[i])
+                            console("Execution Time: {submission.executionTimes[i]} sec.")
 
-            console("bAutograded = %s", submission.bAutoGraded)
-            console("grade = %d", submission.grade)
+            console(f"bAutograded = {submission.bAutoGraded}")
+            console(f"grade = {submission.grade}")
             console("instructorComment = " + submission.instructorComment)
 
 

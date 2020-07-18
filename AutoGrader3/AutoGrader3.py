@@ -34,35 +34,6 @@ import json
 #
 # =======================================================================
 class AutoGrader3(IAGConstant):
-
-    '''# General configurations
-    from ._agConfig import _autoLocateCppCompiler
-    from ._agConfig import _autoLocatePython3Interpreter
-    from ._agConfig import _autoLocateShell
-    from ._agConfig import _loadConfiguration
-    from ._agConfig import _setupConfiguration
-    from ._agConfig import getConfiguration
-    from ._agConfig import saveConfiguration
-    from ._agConfig import setConfiguration
-
-    # Grading Engine module functions
-    from .AutoGrader3 import _updateAutoGraderConfiguration
-    from .AutoGrader3 import _setAssignmentName
-    from .AutoGrader3 import _cleanupDataFiles
-    from .AutoGrader3 import _discoverPrimarySubmissionFile
-    from .AutoGrader3 import _prepareDataFiles
-    from .AutoGrader3 import addSubmission
-    from .AutoGrader3 import addDataFile
-    from .AutoGrader3 import addTestDataFile
-    from .AutoGrader3 import breakOutTestFiles
-    from .AutoGrader3 import grade
-    from .AutoGrader3 import _autoDetectLanguage
-
-    # MOSS
-    from .AutoGrader3 import _runMoss
-    from .AutoGrader3 import _mossThread'''
-
-
     # =======================================================================
     # AutoGraderApp()
     # constructor
@@ -190,10 +161,19 @@ class AutoGrader3(IAGConstant):
 
         return shellPath
 
+
+    # =======================================================================
+    # public String getConfig(String)
+    # This function returns the entire configuration dictionary.
+    # =======================================================================
+    def getConfig(self):
+        return self._ag_config
+
+
     # =======================================================================
     # public String getConfiguration(String key)
     # This function returns the value for the supplied configuration key.
-    # If the key is not in the configuraiton dictionary ag_config, the
+    # If the key is not in the configuration dictionary ag_config, the
     # function returns null.  All configuration keys and values are strings.
     # =======================================================================
     def getConfiguration(self, key):
@@ -203,7 +183,7 @@ class AutoGrader3(IAGConstant):
     # =======================================================================
     # public String setConfiguration(String key, String value)
     # This function returns the value for the supplied configuration key.
-    # If the key is not in the configuraiton dictionary ag_config, the
+    # If the key is not in the configuration dictionary ag_config, the
     # function returns null.  All configuration keys and values are strings.
     # =======================================================================
     def setConfiguration(self, key, value):
@@ -255,8 +235,8 @@ class AutoGrader3(IAGConstant):
         self._ag_config[IAGConstant.AG_CONFIG.MAX_RUNTIME] = "3"
         self._ag_config[IAGConstant.AG_CONFIG.MAX_OUTPUT_LINES] = "100"
         self._ag_config[IAGConstant.AG_CONFIG.INCLUDE_SOURCE] = IAGConstant.YES
-        self._ag_config[IAGConstant.AG_CONFIG.AUTO_UNCOMPRESS] = IAGConstant.YES
-        self._ag_config[IAGConstant.AG_CONFIG.PROCESS_RECURSIVELY] = IAGConstant.YES
+        self._ag_config[IAGConstant.AG_CONFIG.AUTO_UNCOMPRESS] = IAGConstant.NO
+        self._ag_config[IAGConstant.AG_CONFIG.PROCESS_RECURSIVELY] = IAGConstant.NO
         self._ag_config[IAGConstant.AG_CONFIG.PYTHON3_INTERPRETER] = python3Path
         self._ag_config[IAGConstant.AG_CONFIG.CPP_COMPILER] = cppPath
         self._ag_config[IAGConstant.AG_CONFIG.SHELL] = shellPath
@@ -470,7 +450,7 @@ class AutoGrader3(IAGConstant):
                 continue
             else:
                 # remove the top-level test data file
-                self.gradingEngine.testDataFiles.remove(filename)
+                self.gradingEngine.agDocument.testDataFiles.remove(filename)
 
                 # create temporary files in the output directory for each sub-case
                 for counter in range(1, len(subCases) + 1):
@@ -481,7 +461,7 @@ class AutoGrader3(IAGConstant):
                         file.write(subCases[counter - 1])
 
                     # add this to the testFiles list
-                    self.gradingEngine.testDataFiles.append(testDataFileName)
+                    self.gradingEngine.agDocument.testDataFiles.append(testDataFileName)
                     console("creating sub-test case file " + testDataFileName)
 
     # =======================================================================
